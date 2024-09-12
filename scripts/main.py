@@ -8,35 +8,66 @@ from utils import check_raw_data, int2bin
 TG = "../data/games.csv"
 TR = "../data/rounds.csv"
 RAW = "../raw_data"
+README_T = "../assets/README_temp.md"
+README = "../README.md"
+
+players = ['LJL7', '0MRS', '5JMY', 'PARY']
+base_pts_1000 = [298100, 81900, -94100, -288900]
+entries_zh = ['总得点', '平均顺位', '立直率', '和了率', '放铳率',
+              '连对率', '避四率', '立直后和率', '立直后铳率', '平均打点',
+              '平均铳点']
+entries_en = ['Total Points', 'Average Placement', 'Riichi Rate', 'Winning Rate', 'Deal-In Rate',
+              'Renchan Rate', 'Avoiding 4th Place Rate', 'Riichi Win Rate', 'Riichi Deal-In Rate',
+              'Average Points Per Win', 'Average Points Lost Per Deal-In']
+entries_abbr = ['TP', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R', 'RWR', 'RDIR', 'APW', 'APD']
+bonus = [20000, -20000, -40000, -60000]
 
 
-def process_raw():
+def process_data():
     SID, GID, Date, E, S, W, N, Scr_E, Scr_S, Scr_W, Scr_N, Rk_E, Rk_S, Rk_W, Rk_N, Pts_E, Pts_S, Pts_W, Pts_N = [
     ], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], [], []
-    SID_r, GID_r, RID, Ryukyo, Tenpai, Richi, Agari, Hoju, Var_E, Var_S, Var_W, Var_N = [
-    ], [], [], [], [], [], [], [], [], [], [], []
-    seasons = sorted(os.listdir(RAW), key=lambda x: int(x[1:]))
+    SID_r, GID_r, RID, Ryukyo, Richi, Agari, Hoju, Var_E, Var_S, Var_W, Var_N = [
+    ], [], [], [], [], [], [], [], [], [], []
+    with open(README_T, 'r') as f:
+        readme = f.read()
+    seasons = sorted(os.listdir(RAW), key=lambda x: int(x[1:]), reverse=True)
     for s in seasons:
+        sid = int(s[1:])
+        total_points = {p: 0 for p in players}
+        acc_rank = {p: 0 for p in players}
+        cnt_richi = {p: 0 for p in players}
+        cnt_agari = {p: 0 for p in players}
+        cnt_hoju = {p: 0 for p in players}
+        cnt_12 = {p: 0 for p in players}
+        cnt_n4 = {p: 0 for p in players}
+        cnt_ra = {p: 0 for p in players}
+        cnt_rf = {p: 0 for p in players}
+        agari_pts = {p: 0 for p in players}
+        hoju_pts = {p: 0 for p in players}
+        cnt_g = 0
+        cnt_r = 0
+
         games = sorted(os.listdir(os.path.join(RAW, s)), key=lambda x: int(x[1:-5]))
         for g in games:
+            gid = int(g[1:-5])
             with open(os.path.join(RAW, s, g)) as f:
                 data = json.load(f)
             if not check_raw_data(data):
                 continue
+            p = [data[i]['PlayerId'] for i in range(4)]
             final_score = [data[i]['Score'][-1] for i in range(4)]
             sorted_score = sorted(final_score, reverse=True)
             ranking = [sorted_score.index(s) + 1 for s in final_score]
-            bonus = [20000, -20000, -40000, -60000]
-            points = [s + bonus[sorted_score.index(s)] for s in final_score]
-            points = [round(p / 1000, 1) for p in points]
+            points_1000 = [s + bonus[sorted_score.index(s)] for s in final_score]
+            points = [round(p / 1000, 1) for p in points_1000]
 
             SID.append(data[0]['SID'])
             GID.append(data[0]['GID'])
             Date.append(data[0]['Time'].split('_')[0])
-            E.append(data[0]['PlayerId'])
-            S.append(data[1]['PlayerId'])
-            W.append(data[2]['PlayerId'])
-            N.append(data[3]['PlayerId'])
+            E.append(p[0])
+            S.append(p[1])
+            W.append(p[2])
+            N.append(p[3])
             Scr_E.append(final_score[0])
             Scr_S.append(final_score[1])
             Scr_W.append(final_score[2])
@@ -50,21 +81,66 @@ def process_raw():
             Pts_W.append(points[2])
             Pts_N.append(points[3])
 
+            for i in range(4):
+                if sid == 1 and gid <= 49:
+                    total_points[p[i]] += points_1000[i] / 2
+                else:
+                    total_points[p[i]] += points_1000[i]
+                acc_rank[p[i]] += ranking[i]
+                if ranking[i] == 1 or ranking[i] == 2:
+                    cnt_12[p[i]] += 1
+                if ranking[i] != 4:
+                    cnt_n4[p[i]] += 1
+            cnt_g += 1
+
             score = [data[i]['Score'] for i in range(4)]
             ops = [data[i]['Operations'] for i in range(4)]
             for k in range(1, len(score[0])):
                 RID.append(k)
                 SID_r.append(data[0]['SID'])
                 GID_r.append(data[0]['GID'])
-                Ryukyo.append(1 if all(['N' in ops[i][k] for i in range(4)]) else 0)
-                Tenpai.append(0 if Ryukyo[-1] == 0 else sum([1 << i for i in range(4) if score[i][k] > score[i][k-1]]))
-                Richi.append(sum([1 << i for i in range(4) if 'R' in ops[i][k]]))
-                Agari.append(sum([1 << i for i in range(4) if 'A' in ops[i][k]]))
+                Ryukyo.append(int2bin(1 if all(['N' in ops[i][k] for i in range(4)]) else 0))
+                Richi.append(int2bin(sum([1 << i for i in range(4) if 'R' in ops[i][k]])))
+                Agari.append(int2bin(sum([1 << i for i in range(4) if 'A' in ops[i][k]])))
+                Hoju.append(int2bin(sum([1 << i for i in range(4) if 'F' in ops[i][k]])))
                 Var_E.append(score[0][k] - score[0][k-1])
                 Var_S.append(score[1][k] - score[1][k-1])
                 Var_W.append(score[2][k] - score[2][k-1])
                 Var_N.append(score[3][k] - score[3][k-1])
-                Hoju.append(sum([1 << i for i in range(4) if 'F' in ops[i][k]]))
+
+                for i in range(4):
+                    cnt_richi[p[i]] += 1 if 'R' in ops[i][k] else 0
+                    cnt_agari[p[i]] += 1 if 'A' in ops[i][k] else 0
+                    cnt_hoju[p[i]] += 1 if 'F' in ops[i][k] else 0
+                    cnt_ra[p[i]] += 1 if 'R' in ops[i][k] and 'A' in ops[i][k] else 0
+                    cnt_rf[p[i]] += 1 if 'R' in ops[i][k] and 'F' in ops[i][k] else 0
+                    if 'A' in ops[i][k]:
+                        agari_pts[p[i]] += score[i][k] - score[i][k-1]
+                    if 'F' in ops[i][k]:
+                        hoju_pts[p[i]] += score[i][k-1] - score[i][k]
+                        if 'R' in ops[i][k]:
+                            hoju_pts[p[i]] -= 1000
+                cnt_r += 1
+
+        statistics = {}
+        for i in range(4):
+            statistics[players[i]] = [
+                round(
+                    (total_points[players[i]] + base_pts_1000[i] / 2 if sid == 1 else total_points[players[i]]) / 1000,
+                    1),
+                round(acc_rank[players[i]] / cnt_g, 2),
+                round(100 * cnt_richi[players[i]] / cnt_r, 2),
+                round(100 * cnt_agari[players[i]] / cnt_r, 2),
+                round(100 * cnt_hoju[players[i]] / cnt_r, 2),
+                round(100 * cnt_12[players[i]] / cnt_g, 2),
+                round(100 * cnt_n4[players[i]] / cnt_g, 2),
+                round(100 * cnt_ra[players[i]] / cnt_richi[players[i]] if cnt_richi[players[i]] != 0 else 0, 2),
+                round(100 * cnt_rf[players[i]] / cnt_richi[players[i]] if cnt_richi[players[i]] != 0 else 0, 2),
+                round(agari_pts[players[i]] / cnt_agari[players[i]] if cnt_agari[players[i]] != 0 else 0),
+                round(hoju_pts[players[i]] / cnt_hoju[players[i]] if cnt_hoju[players[i]] != 0 else 0),]
+        statistics = pd.DataFrame(statistics, columns=players, index=entries_en)
+        statistics.to_csv(f"../statistics/{s}.csv")
+        readme += f"\n## Statistics of {s}\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
 
     tg = pd.DataFrame({
         'SID': SID,
@@ -95,7 +171,6 @@ def process_raw():
         'GID': GID_r,
         'RID': RID,
         'Ryukyo': Ryukyo,
-        'Tenpai': Tenpai,
         'Richi': Richi,
         'Agari': Agari,
         'Hoju': Hoju,
@@ -107,69 +182,10 @@ def process_raw():
     tr.sort_values(by=['SID', 'GID', 'RID'], ascending=[False, False, False], inplace=True)
     tr.to_csv(TR, index=False)
 
-
-def do_statistics(SID: int):
-    tg = pd.read_csv(TG)
-    tg = tg[tg['SID'] == SID]
-    tr = pd.read_csv(TR)
-    tr = tr[tr['SID'] == SID]
-
-    players = ['LJL7', '0MRS', '5JMY', 'PARY']
-    main_rows = ['赛季总得分', '平均顺位', '立直率', '和了率', '放铳率',
-                 '连对率', '避四率', '立直后和率', '立直后铳率', '平均打点', '平均铳点']
-    stats = [[], [], [], []]
-    base_pts = [298.1, 81.9, -94.1, -288.9] if SID == 1 else [0, 0, 0, 0]
-
-    richi = {p: [] for p in players}
-    agari = {p: [] for p in players}
-    hoju = {p: [] for p in players}
-    agari_pts = {p: 0 for p in players}
-    hoju_pts = {p: 0 for p in players}
-
-    for r in tr.itertuples():
-        print(r)
-        g = tg[tg['GID'] == r['GID']]
-        p = [g['E'], g['S'], g['W'], g['N']]
-        d = ['E', 'S', 'W', 'N']
-        for k in range(4):
-            richi[p[k]].append(1 if r['Richi'] & (1 << k) else 0)
-            agari[p[k]].append(1 if r['Agari'] & (1 << k) else 0)
-            hoju[p[k]].append(1 if r['Hoju'] & (1 << k) else 0)
-            agari_pts[p[k]] += r[f'Var-{d[k]}'] if r['Agari'] & (1 << k) else 0
-            hoju_pts[p[k]] -= r[f'Var-{d[k]}'] if r['Hoju'] & (1 << k) else 0
-
-    for i in range(4):
-        stats[i].append(tg[tg['E'] == players[i]]['Pts-E'].sum()
-                        + tg[tg['S'] == players[i]]['Pts-S'].sum()
-                        + tg[tg['W'] == players[i]]['Pts-W'].sum()
-                        + tg[tg['N'] == players[i]]['Pts-N'].sum()
-                        + base_pts[i])  # 总得分
-        stats[i].append((tg[tg['E'] == players[i]]['Rk-E'].sum()
-                        + tg[tg['S'] == players[i]]['Rk-S'].sum()
-                        + tg[tg['W'] == players[i]]['Rk-W'].sum()
-                        + tg[tg['N'] == players[i]]['Rk-N'].sum()) / len(tg))  # 平均顺位
-        stats[i].append(sum(richi[players[i]]) / len(tr))  # 立直率
-        stats[i].append(sum(agari[players[i]]) / len(tr))  # 和了率
-        stats[i].append(sum(hoju[players[i]]) / len(tr))  # 放铳率
-        stats[i].append(tg[tg['E'] == players[i]]['Rk-E'].count(1) + tg[tg['E'] == players[i]]['Rk-E'].count(2) +
-                        tg[tg['S'] == players[i]]['Rk-S'].count(1) + tg[tg['S'] == players[i]]['Rk-S'].count(2) +
-                        tg[tg['W'] == players[i]]['Rk-W'].count(1) + tg[tg['W'] == players[i]]['Rk-W'].count(2) +
-                        tg[tg['N'] == players[i]]['Rk-N'].count(1) + tg[tg['N'] == players[i]]['Rk-N'].count(2)
-                        / len(tg))  # 连对率
-        stats[i].append(len(tg) - tg[tg['E'] == players[i]]['Rk-E'].count(4)
-                        - tg[tg['S'] == players[i]]['Rk-S'].count(4)
-                        - tg[tg['W'] == players[i]]['Rk-W'].count(4)
-                        - tg[tg['N'] == players[i]]['Rk-N'].count(4))  # 避四率
-        stats[i].append(sum([richi[players[i]][j] & agari[players[i]][j]
-                        for j in range(len(tr))]) / sum(richi[players[i]]))  # 立直后和率
-        stats[i].append(sum([richi[players[i]][j] & hoju[players[i]][j]
-                        for j in range(len(tr))]) / sum(richi[players[i]]))  # 立直后铳率
-        stats[i].append(agari_pts[players[i]] / sum(agari[players[i]]))  # 平均打点
-        stats[i].append(hoju_pts[players[i]] / sum(hoju[players[i]]))  # 平均铳点
-
-    stats = pd.DataFrame(stats, columns=main_rows, index=players)
-    stats.to_csv(f"../statistics/S{SID}.csv")
+    # print(readme)
+    with open(README, 'w') as f:
+        f.write(readme)
 
 
 if __name__ == '__main__':
-    do_statistics(1)
+    process_data()
