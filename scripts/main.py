@@ -138,7 +138,7 @@ def process_data():
                 round(100 * cnt_rf[players[i]] / cnt_richi[players[i]] if cnt_richi[players[i]] != 0 else 0, 2),
                 round(agari_pts[players[i]] / cnt_agari[players[i]] if cnt_agari[players[i]] != 0 else 0),
                 round(hoju_pts[players[i]] / cnt_hoju[players[i]] if cnt_hoju[players[i]] != 0 else 0),]
-        statistics = pd.DataFrame(statistics, columns=players, index=entries_en)
+        statistics = pd.DataFrame(statistics, columns=players, index=entries_abbr)
         statistics.to_csv(f"../statistics/{s}.csv")
         readme += f"\n## Statistics of {s}\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
 
