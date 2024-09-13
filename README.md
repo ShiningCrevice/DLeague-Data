@@ -18,7 +18,7 @@ Statstics are presented below. You can check [this file](./assets/abbr_reference
 | RWR  |   16.67 |   42.86 |   33.33 |   33.33 |
 | RDIR |   33.33 |   42.86 |   16.67 |    0    |
 | APW  | 8025    | 4980    | 4345    | 9000    |
-| APD  | 4660    | 6114    | 5650    | 1950    |
+| APD  | 5060    | 6543    | 5817    | 1950    |
 
 ## Statistics of S1
 
@@ -34,4 +34,4 @@ Statstics are presented below. You can check [this file](./assets/abbr_reference
 | RWR  |   51.52 |   52.31 |   41.33 |   46.34 |
 | RDIR |   12.12 |   10.77 |   13.33 |    7.32 |
 | APW  | 5901    | 5694    | 5917    | 6585    |
-| APD  | 5099    | 5072    | 4740    | 5192    |
+| APD  | 5257    | 5195    | 4953    | 5314    |

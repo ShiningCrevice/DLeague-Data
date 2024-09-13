@@ -118,8 +118,6 @@ def process_data():
                         agari_pts[p[i]] += score[i][k] - score[i][k-1]
                     if 'F' in ops[i][k]:
                         hoju_pts[p[i]] += score[i][k-1] - score[i][k]
-                        if 'R' in ops[i][k]:
-                            hoju_pts[p[i]] -= 1000
                 cnt_r += 1
 
         statistics = {}
