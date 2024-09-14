@@ -13,6 +13,7 @@ README = "../README.md"
 
 players = ['LJL7', '0MRS', '5JMY', 'PARY']
 base_pts_1000 = [298100, 81900, -94100, -288900]
+bonus = [20000, -20000, -40000, -60000]
 entries_zh = ['总得点', '平均顺位', '立直率', '和了率', '放铳率',
               '连对率', '避四率', '立直后和率', '立直后铳率', '平均打点',
               '平均铳点']
@@ -20,7 +21,6 @@ entries_en = ['Total Points', 'Average Placement', 'Riichi Rate', 'Winning Rate'
               'Renchan Rate', 'Avoiding 4th Place Rate', 'Riichi Win Rate', 'Riichi Deal-In Rate',
               'Average Points Per Win', 'Average Points Lost Per Deal-In']
 entries_abbr = ['TP', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R', 'RWR', 'RDIR', 'APW', 'APD']
-bonus = [20000, -20000, -40000, -60000]
 
 
 def process_data():
@@ -52,7 +52,9 @@ def process_data():
             gid = int(g[1:-5])
             with open(os.path.join(RAW, s, g)) as f:
                 data = json.load(f)
-            if not check_raw_data(data):
+            legal, msg = check_raw_data(data)
+            if not legal:
+                print(f"Error in {s}/{g}: {msg}")
                 continue
             p = [data[i]['PlayerId'] for i in range(4)]
             final_score = [data[i]['Score'][-1] for i in range(4)]

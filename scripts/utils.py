@@ -2,7 +2,16 @@ import os
 import json
 
 
-def check_raw_data(data):
+def check_raw_data(data: list[dict]) -> tuple[bool, str]:
+    """Check if the raw data of a game is legal.
+
+    Args:
+        data (list[dict]): a list of 4 player's data in order.
+
+    Returns:
+        (legal, massage) (tuple[bool, str]): `legal` is `True` if the data is legal, otherwise False.
+        `massage` is the reason why the data is illegal. If `legal` is `True`, `massage` is an empty string.
+    """
     return True
 
 
@@ -20,6 +29,7 @@ def add_SID(SID: int):
             data[i]['SID'] = SID
         with open(os.path.join(dir, f), 'w') as file:
             json.dump(data, file)
+    print(f"Add SID for Season {SID}.")
 
 
 if __name__ == '__main__':
