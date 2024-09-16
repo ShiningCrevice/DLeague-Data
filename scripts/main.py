@@ -3,12 +3,12 @@ import json
 import pandas as pd
 from tabulate import tabulate
 
-from utils import check_raw_data, int2bin
+from utils import check_raw_data, int2bin, add_SID
 
 TG = "../data/games.csv"
 TR = "../data/rounds.csv"
 RAW = "../raw_data"
-README_T = "../assets/README_temp.md"
+README_T = "../docs/README_temp.md"
 README = "../README.md"
 
 players = ['LJL7', '0MRS', '5JMY', 'PARY']
@@ -52,10 +52,11 @@ def process_data():
             gid = int(g[1:-5])
             with open(os.path.join(RAW, s, g)) as f:
                 data = json.load(f)
-            legal, msg = check_raw_data(data)
-            if not legal:
-                print(f"Error in {s}/{g}: {msg}")
-                continue
+            if s != 'S1':
+                legal, msg = check_raw_data(data)
+                if not legal:
+                    print(f"Error in {s}/{g}: {msg}")
+                    continue
             p = [data[i]['PlayerId'] for i in range(4)]
             final_score = [data[i]['Score'][-1] for i in range(4)]
             sorted_score = sorted(final_score, reverse=True)
@@ -181,11 +182,14 @@ def process_data():
     })
     tr.sort_values(by=['SID', 'GID', 'RID'], ascending=[False, False, False], inplace=True)
     tr.to_csv(TR, index=False)
+    print("Updated data and statistics.")
 
     # print(readme)
     with open(README, 'w') as f:
         f.write(readme)
+    print("Updated README.")
 
 
 if __name__ == '__main__':
+    add_SID(2)
     process_data()
