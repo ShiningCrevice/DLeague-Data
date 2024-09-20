@@ -3,7 +3,7 @@ import json
 import pandas as pd
 from tabulate import tabulate
 
-from utils import check_raw_data, int2bin, add_SID
+from utils import check_raw_data, int2bin
 
 TG = "../data/games.csv"
 TR = "../data/rounds.csv"
@@ -191,5 +191,4 @@ def process_data():
 
 
 if __name__ == '__main__':
-    add_SID(2)
     process_data()
