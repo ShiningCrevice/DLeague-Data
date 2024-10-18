@@ -5,11 +5,12 @@ from tabulate import tabulate
 
 from utils import check_raw_data, int2bin
 
-TG = "../data/games.csv"
-TR = "../data/rounds.csv"
-RAW = "../raw_data"
-README_T = "../docs/README_temp.md"
-README = "../README.md"
+TG = "data/games.csv"
+TR = "data/rounds.csv"
+RAW = "raw_data"
+README_T = "docs/README_temp.md"
+README = "README.md"
+STATS_DIR = "statistics"
 
 players = ['LJL7', '0MRS', '5JMY', 'PARY']
 base_pts_1000 = [298100, 81900, -94100, -288900]
@@ -140,7 +141,7 @@ def process_data():
                 round(agari_pts[players[i]] / cnt_agari[players[i]] if cnt_agari[players[i]] != 0 else 0),
                 round(hoju_pts[players[i]] / cnt_hoju[players[i]] if cnt_hoju[players[i]] != 0 else 0),]
         statistics = pd.DataFrame(statistics, columns=players, index=entries_abbr)
-        statistics.to_csv(f"../statistics/{s}.csv")
+        statistics.to_csv(os.path.join(STATS_DIR, f"{s}.csv"))
         readme += f"\n## Statistics of {s}\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
 
     tg = pd.DataFrame({
