@@ -142,7 +142,7 @@ def process_data():
                 round(100 * cnt_agari[players[i]] / cnt_r, 2),
                 round(100 * cnt_hoju[players[i]] / cnt_r, 2),
                 round(100 * (cnt_1[players[i]] + cnt_2[players[i]]) / cnt_g, 2),
-                round(100 * (cnt_1[players[i]] + cnt_2[players[i]] + cnt_2[players[i]]) / cnt_g, 2),
+                round(100 * (cnt_1[players[i]] + cnt_2[players[i]] + cnt_3[players[i]]) / cnt_g, 2),
                 round(100 * cnt_ra[players[i]] / cnt_richi[players[i]] if cnt_richi[players[i]] != 0 else 0, 2),
                 round(100 * cnt_rf[players[i]] / cnt_richi[players[i]] if cnt_richi[players[i]] != 0 else 0, 2),
                 round(agari_pts[players[i]] / cnt_agari[players[i]] if cnt_agari[players[i]] != 0 else 0),
