@@ -13,3 +13,7 @@
 | RDIR           | Riichi Deal-In Rate             | 立直后铳率 |
 | APW            | Average Points Per Win          | 平均打点   |
 | APD            | Average Points Lost Per Deal-In | 平均铳点   |
+| 1st            | First Place Count               | 一位次数   |
+| 2nd            | Second Place Count              | 二位次数   |
+| 3rd            | Third Place Count               | 三位次数   |
+| 4th            | Fourth Place Count              | 四位次数   |

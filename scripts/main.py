@@ -17,11 +17,13 @@ base_pts_1000 = [298100, 81900, -94100, -288900]
 bonus = [20000, -20000, -40000, -60000]
 entries_zh = ['总得点', '平均顺位', '立直率', '和了率', '放铳率',
               '连对率', '避四率', '立直后和率', '立直后铳率', '平均打点',
-              '平均铳点']
-entries_en = ['Total Points', 'Average Placement', 'Riichi Rate', 'Winning Rate', 'Deal-In Rate',
-              'Renchan Rate', 'Avoiding 4th Place Rate', 'Riichi Win Rate', 'Riichi Deal-In Rate',
-              'Average Points Per Win', 'Average Points Lost Per Deal-In']
-entries_abbr = ['TP', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R', 'RWR', 'RDIR', 'APW', 'APD']
+              '平均铳点', '一位次数', '二位次数', '三位次数', '四位次数']
+entries_en = [
+    'Total Points', 'Average Placement', 'Riichi Rate', 'Winning Rate', 'Deal-In Rate', 'Renchan Rate',
+    'Avoiding 4th Place Rate', 'Riichi Win Rate', 'Riichi Deal-In Rate', 'Average Points Per Win',
+    'Average Points Lost Per Deal-In', 'First Place Count', 'Second Place Count', 'Third Place Count',
+    'Fourth Place Count']
+entries_abbr = ['TP', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R', 'RWR', 'RDIR', 'APW', 'APD', '1st', '2nd', '3rd', '4th']
 
 
 def process_data():
@@ -39,8 +41,10 @@ def process_data():
         cnt_richi = {p: 0 for p in players}
         cnt_agari = {p: 0 for p in players}
         cnt_hoju = {p: 0 for p in players}
-        cnt_12 = {p: 0 for p in players}
-        cnt_n4 = {p: 0 for p in players}
+        cnt_1 = {p: 0 for p in players}
+        cnt_2 = {p: 0 for p in players}
+        cnt_3 = {p: 0 for p in players}
+        cnt_4 = {p: 0 for p in players}
         cnt_ra = {p: 0 for p in players}
         cnt_rf = {p: 0 for p in players}
         agari_pts = {p: 0 for p in players}
@@ -91,10 +95,14 @@ def process_data():
                 else:
                     total_points[p[i]] += points_1000[i]
                 acc_rank[p[i]] += ranking[i]
-                if ranking[i] == 1 or ranking[i] == 2:
-                    cnt_12[p[i]] += 1
-                if ranking[i] != 4:
-                    cnt_n4[p[i]] += 1
+                if ranking[i] == 1:
+                    cnt_1[p[i]] += 1
+                elif ranking[i] == 2:
+                    cnt_2[p[i]] += 1
+                elif ranking[i] == 3:
+                    cnt_3[p[i]] += 1
+                elif ranking[i] == 4:
+                    cnt_4[p[i]] += 1
             cnt_g += 1
 
             score = [data[i]['Score'] for i in range(4)]
@@ -128,18 +136,21 @@ def process_data():
         for i in range(4):
             statistics[players[i]] = [
                 round(
-                    (total_points[players[i]] + base_pts_1000[i] / 2 if sid == 1 else total_points[players[i]]) / 1000,
-                    1),
+                    (total_points[players[i]] + base_pts_1000[i] / 2 if sid == 1 else total_points[players[i]]) / 1000, 1),
                 round(acc_rank[players[i]] / cnt_g, 2),
                 round(100 * cnt_richi[players[i]] / cnt_r, 2),
                 round(100 * cnt_agari[players[i]] / cnt_r, 2),
                 round(100 * cnt_hoju[players[i]] / cnt_r, 2),
-                round(100 * cnt_12[players[i]] / cnt_g, 2),
-                round(100 * cnt_n4[players[i]] / cnt_g, 2),
+                round(100 * (cnt_1[players[i]] + cnt_2[players[i]]) / cnt_g, 2),
+                round(100 * (cnt_1[players[i]] + cnt_2[players[i]] + cnt_2[players[i]]) / cnt_g, 2),
                 round(100 * cnt_ra[players[i]] / cnt_richi[players[i]] if cnt_richi[players[i]] != 0 else 0, 2),
                 round(100 * cnt_rf[players[i]] / cnt_richi[players[i]] if cnt_richi[players[i]] != 0 else 0, 2),
                 round(agari_pts[players[i]] / cnt_agari[players[i]] if cnt_agari[players[i]] != 0 else 0),
-                round(hoju_pts[players[i]] / cnt_hoju[players[i]] if cnt_hoju[players[i]] != 0 else 0),]
+                round(hoju_pts[players[i]] / cnt_hoju[players[i]] if cnt_hoju[players[i]] != 0 else 0),
+                cnt_1[players[i]],
+                cnt_2[players[i]],
+                cnt_3[players[i]],
+                cnt_4[players[i]],]
         statistics = pd.DataFrame(statistics, columns=players, index=entries_abbr)
         statistics.to_csv(os.path.join(STATS_DIR, f"{s}.csv"))
         readme += f"\n## Statistics of {s}\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"

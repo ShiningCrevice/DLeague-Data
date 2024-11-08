@@ -1,5 +1,17 @@
 import os
 import json
+from tabulate import tabulate
+
+
+entries_zh = ['总得点', '平均顺位', '立直率', '和了率', '放铳率',
+              '连对率', '避四率', '立直后和率', '立直后铳率', '平均打点',
+              '平均铳点', '一位次数', '二位次数', '三位次数', '四位次数']
+entries_en = [
+    'Total Points', 'Average Placement', 'Riichi Rate', 'Winning Rate', 'Deal-In Rate', 'Renchan Rate',
+    'Avoiding 4th Place Rate', 'Riichi Win Rate', 'Riichi Deal-In Rate', 'Average Points Per Win',
+    'Average Points Lost Per Deal-In', 'First Place Count', 'Second Place Count', 'Third Place Count',
+    'Fourth Place Count']
+entries_abbr = ['TP', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R', 'RWR', 'RDIR', 'APW', 'APD', '1st', '2nd', '3rd', '4th']
 
 
 def check_raw_data(data: list[dict]) -> tuple[bool, str]:
@@ -66,5 +78,15 @@ def add_SID(SID: int):
     print(f"Added SID for Season {SID}.")
 
 
+def generate_abbr_reference():
+    table = {}
+    table['Abbreviation'] = entries_abbr
+    table['English'] = entries_en
+    table['Chinese'] = entries_zh
+    with open('docs/abbr_reference.md', 'w', encoding='utf-8') as f:
+        f.write(f"# Abbreviations\n\n{tabulate(table, headers='keys', tablefmt='github')}\n")
+
+
 if __name__ == '__main__':
-    add_SID(2)
+    # add_SID(2)
+    generate_abbr_reference()
