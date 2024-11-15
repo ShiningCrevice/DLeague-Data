@@ -1,17 +1,69 @@
 import os
 import json
+import pandas as pd
 from tabulate import tabulate
+from typing import Union
 
 
 entries_zh = ['总得点', '平均顺位', '立直率', '和了率', '放铳率',
               '连对率', '避四率', '立直后和率', '立直后铳率', '平均打点',
-              '平均铳点', '一位次数', '二位次数', '三位次数', '四位次数']
+              '平均铳点', '一位次数', '二位次数', '三位次数', '四位次数',
+              '半庄最高得点']
 entries_en = [
     'Total Points', 'Average Placement', 'Riichi Rate', 'Winning Rate', 'Deal-In Rate', 'Renchan Rate',
     'Avoiding 4th Place Rate', 'Riichi Win Rate', 'Riichi Deal-In Rate', 'Average Points Per Win',
     'Average Points Lost Per Deal-In', 'First Place Count', 'Second Place Count', 'Third Place Count',
-    'Fourth Place Count']
-entries_abbr = ['TP', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R', 'RWR', 'RDIR', 'APW', 'APD', '1st', '2nd', '3rd', '4th']
+    'Fourth Place Count', 'Highest Hanchan Score']
+entries_abbr = ['TP', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R',
+                'RWR', 'RDIR', 'APW', 'APD', '1st', '2nd', '3rd', '4th', 'HHS']
+
+
+def build_csv(json_file):
+    with open(json_file, 'r') as fp:
+        data = json.load(fp)
+
+    cnt_r = len(data[0]['Score'])
+
+    df = pd.DataFrame(
+        {data[i]['PlayerId']: ["0(S)"] +
+         [f"{data[i]['Score'][j+1]-data[i]['Score'][j]} " +
+          f"({data[i]['Operations'][j+1]})" for j in range(cnt_r - 1)]
+         for i in range(4)})
+
+    df.to_csv('debug.csv')
+
+
+def fix_GT61(file_path):
+    try:
+        with open(file_path, 'r', encoding='utf-8') as file:
+            data = json.load(file)
+
+        def update_values(obj):
+            flag = False
+            if isinstance(obj, dict):
+                for key, value in obj.items():
+                    if value == "GT61":
+                        obj[key] = "0MRS"
+                        flag = True
+                    else:
+                        update_values(value)
+            elif isinstance(obj, list):
+                for index in range(len(obj)):
+                    if obj[index] == "GT61":
+                        obj[index] = "0MRS"
+                        flag = True
+                    else:
+                        update_values(obj[index])
+            return flag
+
+        if update_values(data):
+            with open(file_path, 'w', encoding='utf-8') as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+
+            print(f"Fixed GT61 to 0MRS in {file_path}")
+
+    except Exception as e:
+        print(f"Error occurred while fixing {file_path}:\n{e}")
 
 
 def check_raw_data(data: list[dict]) -> tuple[bool, str]:
@@ -87,6 +139,56 @@ def generate_abbr_reference():
         f.write(f"# Abbreviations\n\n{tabulate(table, headers='keys', tablefmt='github')}\n")
 
 
-if __name__ == '__main__':
-    # add_SID(2)
-    generate_abbr_reference()
+def is_raw_data_piece(data: Union[dict, str]) -> bool:
+    """Checks if the given dictionary represents a valid raw data piece.
+
+    Args:
+        data (dict): The dictionary to check.
+
+    Returns:
+        bool: True if the dictionary is a valid raw data piece, False otherwise.
+
+    Examples:
+        >>> is_raw_data_piece({
+        ...     'SID': 123,
+        ...     'GID': 456,
+        ...     'Time': '2023-10-01T12:00:00Z',
+        ...     'PlayerId': 'ABCD',
+        ...     'Score': [10, 20],
+        ...     'Operations': ['op1', 'op2']
+        ... })
+        True
+
+        >>> is_raw_data_piece({
+        ...     'SID': '123',
+        ...     'GID': 456,
+        ...     'Time': '2023-10-01T12:00:00Z',
+        ...     'PlayerId': 'ABCD',
+        ...     'Score': [10, 20],
+        ...     'Operations': ['op1', 'op2']
+        ... })
+        False
+    """
+    if isinstance(data, str):
+        try:
+            data = json.loads(data)
+        except json.JSONDecodeError:
+            return False
+    if not isinstance(data, dict):
+        return False
+    if not ('SID' in data and isinstance(data['SID'], int)):
+        return False
+    if not ('GID' in data and isinstance(data['GID'], int)):
+        return False
+    if not ('Time' in data and isinstance(data['Time'], str)):
+        return False
+    if not ('PlayerId' in data and isinstance(data['PlayerId'], str)
+            and len(data['PlayerId'])) == 4:
+        return False
+    if not ('Score' in data and isinstance(data['Score'], list)
+            and len(data['Score']) > 0 and isinstance(data['Score'][0], int)):
+        return False
+    if not ('Operations' in data and isinstance(data['Operations'], list)
+            and len(data['Operations']) > 0 and isinstance(data['Operations'][0], str)):
+        return False
+    return True

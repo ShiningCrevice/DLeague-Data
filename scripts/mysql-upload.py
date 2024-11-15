@@ -2,7 +2,7 @@ import json
 import mysql.connector
 import argparse
 
-from fixdata import build_csv, fix_GT61
+from utils import build_csv, fix_GT61
 
 
 HOST = 'localhost'

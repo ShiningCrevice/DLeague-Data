@@ -4,6 +4,7 @@ import pandas as pd
 from tabulate import tabulate
 
 from utils import check_raw_data, int2bin
+from utils import entries_abbr as readme_entries
 
 TG = "data/games.csv"
 TR = "data/rounds.csv"
@@ -15,15 +16,6 @@ STATS_DIR = "statistics"
 players = ['LJL7', '0MRS', '5JMY', 'PARY']
 base_pts_1000 = [298100, 81900, -94100, -288900]
 bonus = [20000, -20000, -40000, -60000]
-entries_zh = ['总得点', '平均顺位', '立直率', '和了率', '放铳率',
-              '连对率', '避四率', '立直后和率', '立直后铳率', '平均打点',
-              '平均铳点', '一位次数', '二位次数', '三位次数', '四位次数']
-entries_en = [
-    'Total Points', 'Average Placement', 'Riichi Rate', 'Winning Rate', 'Deal-In Rate', 'Renchan Rate',
-    'Avoiding 4th Place Rate', 'Riichi Win Rate', 'Riichi Deal-In Rate', 'Average Points Per Win',
-    'Average Points Lost Per Deal-In', 'First Place Count', 'Second Place Count', 'Third Place Count',
-    'Fourth Place Count']
-entries_abbr = ['TP', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R', 'RWR', 'RDIR', 'APW', 'APD', '1st', '2nd', '3rd', '4th']
 
 
 def process_data():
@@ -49,6 +41,7 @@ def process_data():
         cnt_rf = {p: 0 for p in players}
         agari_pts = {p: 0 for p in players}
         hoju_pts = {p: 0 for p in players}
+        highest_score = {p: 0 for p in players}
         cnt_g = 0
         cnt_r = 0
 
@@ -103,6 +96,8 @@ def process_data():
                     cnt_3[p[i]] += 1
                 elif ranking[i] == 4:
                     cnt_4[p[i]] += 1
+                if final_score[i] > highest_score[p[i]]:
+                    highest_score[p[i]] = final_score[i]
             cnt_g += 1
 
             score = [data[i]['Score'] for i in range(4)]
@@ -150,8 +145,9 @@ def process_data():
                 cnt_1[players[i]],
                 cnt_2[players[i]],
                 cnt_3[players[i]],
-                cnt_4[players[i]],]
-        statistics = pd.DataFrame(statistics, columns=players, index=entries_abbr)
+                cnt_4[players[i]],
+                highest_score[players[i]],]
+        statistics = pd.DataFrame(statistics, columns=players, index=readme_entries)
         statistics.to_csv(os.path.join(STATS_DIR, f"{s}.csv"))
         readme += f"\n## Statistics of {s}\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
 
