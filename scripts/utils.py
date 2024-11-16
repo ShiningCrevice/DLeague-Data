@@ -18,16 +18,17 @@ entries_abbr = ['TP', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R',
                 'RWR', 'RDIR', 'APW', 'APD', '1st', '2nd', '3rd', '4th', 'HHS']
 
 
-def build_csv(json_file):
+def build_debug_csv(json_file):
     with open(json_file, 'r') as fp:
         data = json.load(fp)
 
-    cnt_r = len(data[0]['Score'])
+    cnt_r = max([len(data[i]['Score']) for i in range(4)])
 
     df = pd.DataFrame(
         {data[i]['PlayerId']: ["0(S)"] +
          [f"{data[i]['Score'][j+1]-data[i]['Score'][j]} " +
-          f"({data[i]['Operations'][j+1]})" for j in range(cnt_r - 1)]
+          f"({data[i]['Operations'][j+1]})" if j+1 < len(data[i]['Score']) and j+1 < len(data[i]['Operations']) else ""
+          for j in range(cnt_r - 1)]
          for i in range(4)})
 
     df.to_csv('debug.csv')
@@ -192,3 +193,7 @@ def is_raw_data_piece(data: Union[dict, str]) -> bool:
             and len(data['Operations']) > 0 and isinstance(data['Operations'][0], str)):
         return False
     return True
+
+
+if __name__ == '__main__':
+    build_debug_csv('raw_data/S2/G35.json')
