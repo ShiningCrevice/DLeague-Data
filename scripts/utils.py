@@ -31,7 +31,7 @@ def build_debug_csv(json_file):
           for j in range(cnt_r - 1)]
          for i in range(4)})
 
-    df.to_csv('debug.csv')
+    df.to_csv(f"debug_{json_file.replace('.json', '').split('/')[-1]}.csv")
 
 
 def fix_GT61(file_path):
@@ -67,7 +67,7 @@ def fix_GT61(file_path):
         print(f"Error occurred while fixing {file_path}:\n{e}")
 
 
-def check_raw_data(data: list[dict]) -> tuple[bool, str]:
+def check_raw_data(data):
     """Check if the raw data of a game is legal.
 
     Args:
@@ -196,4 +196,6 @@ def is_raw_data_piece(data: Union[dict, str]) -> bool:
 
 
 if __name__ == '__main__':
-    build_debug_csv('raw_data/S2/G35.json')
+    build_debug_csv('raw_data/S2/G36.json')
+    build_debug_csv('raw_data/S2/G37.json')
+    build_debug_csv('raw_data/S2/G38.json')
