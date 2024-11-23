@@ -3,22 +3,24 @@ import json
 import pandas as pd
 from tabulate import tabulate
 from typing import Union
+from argparse import ArgumentParser
 
 
-entries_zh = ['总得点', '平均顺位', '立直率', '和了率', '放铳率',
+entries_zh = ['总得点', '素点', '平均顺位', '立直率', '和了率', '放铳率',
               '连对率', '避四率', '立直后和率', '立直后铳率', '平均打点',
               '平均铳点', '一位次数', '二位次数', '三位次数', '四位次数',
               '半庄最高得点']
 entries_en = [
-    'Total Points', 'Average Placement', 'Riichi Rate', 'Winning Rate', 'Deal-In Rate', 'Renchan Rate',
+    'Total Points', 'Raw Points', 'Average Placement', 'Riichi Rate', 'Winning Rate', 'Deal-In Rate', 'Renchan Rate',
     'Avoiding 4th Place Rate', 'Riichi Win Rate', 'Riichi Deal-In Rate', 'Average Points Per Win',
     'Average Points Lost Per Deal-In', 'First Place Count', 'Second Place Count', 'Third Place Count',
     'Fourth Place Count', 'Highest Hanchan Score']
-entries_abbr = ['TP', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R',
+entries_abbr = ['Pt', 'RawPt', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R',
                 'RWR', 'RDIR', 'APW', 'APD', '1st', '2nd', '3rd', '4th', 'HHS']
 
 
-def build_debug_csv(json_file):
+def build_debug_csv(game):
+    json_file = f"raw_data/{game}.json"
     with open(json_file, 'r') as fp:
         data = json.load(fp)
 
@@ -31,7 +33,7 @@ def build_debug_csv(json_file):
           for j in range(cnt_r - 1)]
          for i in range(4)})
 
-    df.to_csv(f"debug_{json_file.replace('.json', '').split('/')[-1]}.csv")
+    df.to_csv(f"debug_{game.replace('/', '_')}.csv")
 
 
 def fix_GT61(file_path):
@@ -195,7 +197,34 @@ def is_raw_data_piece(data: Union[dict, str]) -> bool:
     return True
 
 
+def get_newest_game():
+    newest_sid = 0
+    newest_gid = 0
+    for sid in range(1, 10):
+        dir = f"raw_data/S{sid}"
+        if not os.path.exists(dir):
+            continue
+        files = sorted(os.listdir(dir), key=lambda x: int(x[1:-5]))
+        for f in files:
+            gid = int(f[1:-5])
+            if gid > newest_gid:
+                newest_sid = sid
+                newest_gid = gid
+    return f"S{newest_sid}/G{newest_gid}"
+
+
 if __name__ == '__main__':
-    build_debug_csv('raw_data/S2/G36.json')
-    build_debug_csv('raw_data/S2/G37.json')
-    build_debug_csv('raw_data/S2/G38.json')
+    if os.getcwd().split('/')[-1] == 'scripts' or os.getcwd().split('\\')[-1] == 'scripts':
+        os.chdir('..')
+    
+    arg_parser = ArgumentParser()
+    arg_parser.add_argument('--game', '-g', type=str, help='The game to build csv.', default=None)
+    arg_parser.add_argument('--abbr', '-a', action='store_true', help='Generate abbreviation reference.', default=False)
+    args = arg_parser.parse_args()
+    
+    if args.game:
+        build_debug_csv(args.game)
+    elif args.abbr:
+        generate_abbr_reference()
+    else:
+        build_debug_csv(get_newest_game())

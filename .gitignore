@@ -130,3 +130,5 @@ cython_debug/
 
 # flake8 linting tool settings
 .flake8
+
+debug_*.csv

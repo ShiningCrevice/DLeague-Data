@@ -3,7 +3,7 @@ import json
 import pandas as pd
 from tabulate import tabulate
 
-from utils import check_raw_data, int2bin
+from utils import check_raw_data, int2bin, build_debug_csv
 from utils import entries_abbr as readme_entries
 
 TG = "data/games.csv"
@@ -14,7 +14,7 @@ README = "README.md"
 STATS_DIR = "statistics"
 
 players = ['LJL7', '0MRS', '5JMY', 'PARY']
-base_pts_1000 = [298100, 81900, -94100, -288900]
+base_pt_1000 = [298100, 81900, -94100, -288900]
 bonus = [20000, -20000, -40000, -60000]
 
 
@@ -28,7 +28,8 @@ def process_data():
     seasons = sorted(os.listdir(RAW), key=lambda x: int(x[1:]), reverse=True)
     for s in seasons:
         sid = int(s[1:])
-        total_points = {p: 0 for p in players}
+        total_pt_1000 = {p: 0 for p in players}
+        raw_pt_1000 = {p: 0 for p in players}
         acc_rank = {p: 0 for p in players}
         cnt_richi = {p: 0 for p in players}
         cnt_agari = {p: 0 for p in players}
@@ -39,9 +40,9 @@ def process_data():
         cnt_4 = {p: 0 for p in players}
         cnt_ra = {p: 0 for p in players}
         cnt_rf = {p: 0 for p in players}
-        agari_pts = {p: 0 for p in players}
-        hoju_pts = {p: 0 for p in players}
-        highest_score = {p: 0 for p in players}
+        agari_scr = {p: 0 for p in players}
+        hoju_scr = {p: 0 for p in players}
+        highest_scr = {p: 0 for p in players}
         cnt_g = 0
         cnt_r = 0
 
@@ -54,12 +55,14 @@ def process_data():
                 legal, msg = check_raw_data(data)
                 if not legal:
                     print(f"Error in {s}/{g}: {msg}")
+                    build_debug_csv(f'{s}/{g}', data)
                     continue
             p = [data[i]['PlayerId'] for i in range(4)]
             final_score = [data[i]['Score'][-1] for i in range(4)]
             sorted_score = sorted(final_score, reverse=True)
             ranking = [sorted_score.index(s) + 1 for s in final_score]
             points_1000 = [s + bonus[sorted_score.index(s)] for s in final_score]
+            raw_points_1000 = [s - 25000 for s in final_score]
             points = [round(p / 1000, 1) for p in points_1000]
 
             SID.append(data[0]['SID'])
@@ -84,9 +87,10 @@ def process_data():
 
             for i in range(4):
                 if sid == 1 and gid <= 49:
-                    total_points[p[i]] += points_1000[i] / 2
+                    total_pt_1000[p[i]] += points_1000[i] / 2
                 else:
-                    total_points[p[i]] += points_1000[i]
+                    total_pt_1000[p[i]] += points_1000[i]
+                raw_pt_1000[p[i]] += raw_points_1000[i]
                 acc_rank[p[i]] += ranking[i]
                 if ranking[i] == 1:
                     cnt_1[p[i]] += 1
@@ -96,8 +100,8 @@ def process_data():
                     cnt_3[p[i]] += 1
                 elif ranking[i] == 4:
                     cnt_4[p[i]] += 1
-                if final_score[i] > highest_score[p[i]]:
-                    highest_score[p[i]] = final_score[i]
+                if final_score[i] > highest_scr[p[i]]:
+                    highest_scr[p[i]] = final_score[i]
             cnt_g += 1
 
             score = [data[i]['Score'] for i in range(4)]
@@ -122,16 +126,17 @@ def process_data():
                     cnt_ra[p[i]] += 1 if 'R' in ops[i][k] and 'A' in ops[i][k] else 0
                     cnt_rf[p[i]] += 1 if 'R' in ops[i][k] and 'F' in ops[i][k] else 0
                     if 'A' in ops[i][k]:
-                        agari_pts[p[i]] += score[i][k] - score[i][k-1]
+                        agari_scr[p[i]] += score[i][k] - score[i][k-1]
                     if 'F' in ops[i][k]:
-                        hoju_pts[p[i]] += score[i][k-1] - score[i][k]
+                        hoju_scr[p[i]] += score[i][k-1] - score[i][k]
                 cnt_r += 1
 
         statistics = {}
         for i in range(4):
             statistics[players[i]] = [
-                round(
-                    (total_points[players[i]] + base_pts_1000[i] / 2 if sid == 1 else total_points[players[i]]) / 1000, 1),
+                round((total_pt_1000[players[i]] + base_pt_1000[i] / 2 if sid == 1 
+                       else total_pt_1000[players[i]]) / 1000, 1),
+                round(raw_pt_1000[players[i]] / 1000, 1),
                 round(acc_rank[players[i]] / cnt_g, 2),
                 round(100 * cnt_richi[players[i]] / cnt_r, 2),
                 round(100 * cnt_agari[players[i]] / cnt_r, 2),
@@ -140,13 +145,13 @@ def process_data():
                 round(100 * (cnt_1[players[i]] + cnt_2[players[i]] + cnt_3[players[i]]) / cnt_g, 2),
                 round(100 * cnt_ra[players[i]] / cnt_richi[players[i]] if cnt_richi[players[i]] != 0 else 0, 2),
                 round(100 * cnt_rf[players[i]] / cnt_richi[players[i]] if cnt_richi[players[i]] != 0 else 0, 2),
-                round(agari_pts[players[i]] / cnt_agari[players[i]] if cnt_agari[players[i]] != 0 else 0),
-                round(hoju_pts[players[i]] / cnt_hoju[players[i]] if cnt_hoju[players[i]] != 0 else 0),
+                round(agari_scr[players[i]] / cnt_agari[players[i]] if cnt_agari[players[i]] != 0 else 0),
+                round(hoju_scr[players[i]] / cnt_hoju[players[i]] if cnt_hoju[players[i]] != 0 else 0),
                 cnt_1[players[i]],
                 cnt_2[players[i]],
                 cnt_3[players[i]],
                 cnt_4[players[i]],
-                highest_score[players[i]],]
+                highest_scr[players[i]],]
         statistics = pd.DataFrame(statistics, columns=players, index=readme_entries)
         statistics.to_csv(os.path.join(STATS_DIR, f"{s}.csv"))
         readme += f"\n## Statistics of {s}\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
@@ -199,4 +204,6 @@ def process_data():
 
 
 if __name__ == '__main__':
+    if os.getcwd().split('/')[-1] == 'scripts' or os.getcwd().split('\\')[-1] == 'scripts':
+        os.chdir('..')
     process_data()
