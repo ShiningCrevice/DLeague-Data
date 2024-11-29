@@ -55,7 +55,7 @@ def process_data():
                 legal, msg = check_raw_data(data)
                 if not legal:
                     print(f"Error in {s}/{g}: {msg}")
-                    build_debug_csv(f'{s}/{g}', data)
+                    build_debug_csv(f'{s}/{g}')
                     continue
             p = [data[i]['PlayerId'] for i in range(4)]
             final_score = [data[i]['Score'][-1] for i in range(4)]
@@ -134,7 +134,7 @@ def process_data():
         statistics = {}
         for i in range(4):
             statistics[players[i]] = [
-                round((total_pt_1000[players[i]] + base_pt_1000[i] / 2 if sid == 1 
+                round((total_pt_1000[players[i]] + base_pt_1000[i] / 2 if sid == 1
                        else total_pt_1000[players[i]]) / 1000, 1),
                 round(raw_pt_1000[players[i]] / 1000, 1),
                 round(acc_rank[players[i]] / cnt_g, 2),

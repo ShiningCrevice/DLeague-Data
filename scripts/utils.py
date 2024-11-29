@@ -69,7 +69,7 @@ def fix_GT61(file_path):
         print(f"Error occurred while fixing {file_path}:\n{e}")
 
 
-def check_raw_data(data):
+def check_raw_data(data: list[dict]) -> tuple[bool, str]:
     """Check if the raw data of a game is legal.
 
     Args:
@@ -216,12 +216,12 @@ def get_newest_game():
 if __name__ == '__main__':
     if os.getcwd().split('/')[-1] == 'scripts' or os.getcwd().split('\\')[-1] == 'scripts':
         os.chdir('..')
-    
+
     arg_parser = ArgumentParser()
     arg_parser.add_argument('--game', '-g', type=str, help='The game to build csv.', default=None)
     arg_parser.add_argument('--abbr', '-a', action='store_true', help='Generate abbreviation reference.', default=False)
     args = arg_parser.parse_args()
-    
+
     if args.game:
         build_debug_csv(args.game)
     elif args.abbr:
