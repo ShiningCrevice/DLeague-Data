@@ -54,9 +54,13 @@ def process_data():
             if s != 'S1':
                 legal, msg = check_raw_data(data)
                 if not legal:
-                    print(f"Error in {s}/{g}: {msg}")
-                    build_debug_csv(f'{s}/{g}')
+                    print(f"Error in {s}/G{gid}: {msg}")
+                    build_debug_csv(f'{s}/G{gid}')
                     continue
+                else:
+                    if os.path.exists(f"debug_{s}_G{gid}.csv"):
+                        os.remove(f"debug_{s}_G{gid}.csv")
+                        print(f"Removed debug_{s}_G{gid}.csv.")
             p = [data[i]['PlayerId'] for i in range(4)]
             final_score = [data[i]['Score'][-1] for i in range(4)]
             sorted_score = sorted(final_score, reverse=True)

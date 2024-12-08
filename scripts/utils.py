@@ -34,6 +34,7 @@ def build_debug_csv(game):
          for i in range(4)})
 
     df.to_csv(f"debug_{game.replace('/', '_')}.csv")
+    print(f"Built debug csv for {game}.")
 
 
 def fix_GT61(file_path):
