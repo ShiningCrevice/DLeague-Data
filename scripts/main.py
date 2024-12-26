@@ -14,8 +14,9 @@ README = "README.md"
 STATS_DIR = "statistics"
 
 players = ['LJL7', '0MRS', '5JMY', 'PARY']
-base_pt_1000 = [298100, 81900, -94100, -288900]
 bonus = [20000, -20000, -40000, -60000]
+n_regular_games = [0, 49, 50]
+s1_base_pt_1000 = [298100, 81900, -94100, -288900]
 
 
 def process_data():
@@ -90,7 +91,7 @@ def process_data():
             Pts_N.append(points[3])
 
             for i in range(4):
-                if sid == 1 and gid <= 49:
+                if gid <= n_regular_games[sid if sid < len(n_regular_games) else 0]:
                     total_pt_1000[p[i]] += points_1000[i] / 2
                 else:
                     total_pt_1000[p[i]] += points_1000[i]
@@ -138,7 +139,7 @@ def process_data():
         statistics = {}
         for i in range(4):
             statistics[players[i]] = [
-                round((total_pt_1000[players[i]] + base_pt_1000[i] / 2 if sid == 1
+                round((total_pt_1000[players[i]] + s1_base_pt_1000[i] / 2 if sid == 1
                        else total_pt_1000[players[i]]) / 1000, 1),
                 round(raw_pt_1000[players[i]] / 1000, 1),
                 round(acc_rank[players[i]] / cnt_g, 2),
@@ -158,7 +159,10 @@ def process_data():
                 highest_scr[players[i]],]
         statistics = pd.DataFrame(statistics, columns=players, index=readme_entries)
         statistics.to_csv(os.path.join(STATS_DIR, f"{s}.csv"))
-        readme += f"\n## Statistics of {s}\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
+        if sid < len(n_regular_games):
+            readme += f"\n## Statistics of {s} (Final)\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
+        else:
+            readme += f"\n## Statistics of {s} (Regular Season)\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
 
     tg = pd.DataFrame({
         'SID': SID,
