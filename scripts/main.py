@@ -44,6 +44,7 @@ def process_data():
         agari_scr = {p: 0 for p in players}
         hoju_scr = {p: 0 for p in players}
         highest_scr = {p: 0 for p in players}
+        lowest_scr = {p: 0 for p in players}
         cnt_g = 0
         cnt_r = 0
 
@@ -107,6 +108,8 @@ def process_data():
                     cnt_4[p[i]] += 1
                 if final_score[i] > highest_scr[p[i]]:
                     highest_scr[p[i]] = final_score[i]
+                if final_score[i] < lowest_scr[p[i]]:
+                    lowest_scr[p[i]] = final_score[i]
             cnt_g += 1
 
             score = [data[i]['Score'] for i in range(4)]
@@ -156,7 +159,9 @@ def process_data():
                 cnt_2[players[i]],
                 cnt_3[players[i]],
                 cnt_4[players[i]],
-                highest_scr[players[i]],]
+                highest_scr[players[i]],
+                lowest_scr[players[i]]
+            ]
         statistics = pd.DataFrame(statistics, columns=players, index=readme_entries)
         statistics.to_csv(os.path.join(STATS_DIR, f"{s}.csv"))
         if sid < len(n_regular_games):
