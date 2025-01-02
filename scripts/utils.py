@@ -6,17 +6,23 @@ from typing import Union
 from argparse import ArgumentParser
 
 
-entries_zh = ['总得点', '素点', '平均顺位', '立直率', '和了率', '放铳率',
-              '连对率', '避四率', '立直后和率', '立直后铳率', '平均打点',
-              '平均铳点', '一位次数', '二位次数', '三位次数', '四位次数',
-              '半庄最高得点', '半庄最低得点']
+entries_zh = ['总得点', '素点', '平均顺位', '立直率', '和了率', 
+              '放铳率', '连对率', '避四率', '立直后和率', '立直后铳率', 
+              '平均打点', '平均铳点', '一位次数', '二位次数', '三位次数', 
+              '四位次数', '半庄最高得点', '半庄最低得点']
 entries_en = [
-    'Total Points', 'Raw Points', 'Average Placement', 'Riichi Rate', 'Winning Rate', 'Deal-In Rate', 'Renchan Rate',
-    'Avoiding 4th Place Rate', 'Riichi Win Rate', 'Riichi Deal-In Rate', 'Average Points Per Win',
-    'Average Points Lost Per Deal-In', 'First Place Count', 'Second Place Count', 'Third Place Count',
+    'Total Points', 'Raw Points', 'Average Placement', 'Riichi Rate', 'Winning Rate', 
+    'Deal-In Rate', 'Renchan Rate', 'Avoiding 4th Place Rate', 'Riichi Win Rate', 'Riichi Deal-In Rate', 
+    'Average Points Per Win', 'Average Points Lost Per Deal-In', 'First Place Count', 'Second Place Count', 'Third Place Count',
     'Fourth Place Count', 'Highest Hanchan Score', 'Lowest Hanchan Score']
-entries_abbr = ['Pt', 'RawPt', 'AP', 'RR', 'WR', 'DIR', 'RenR', 'A4R',
-                'RWR', 'RDIR', 'APW', 'APD', '1st', '2nd', '3rd', '4th', 'HiScr', 'LoScr']
+entries_abbr = ['Pt', 'RawPt', 'AP', 'RR', 'WR', 
+                'DIR', 'RenR', 'A4R', 'RWR', 'RDIR', 
+                'APW', 'APD', '1st', '2nd', '3rd', 
+                '4th', 'HiScr', 'LoScr']
+entries_switch = [True, True, True, True, True, 
+                  True, True, True, True, True, 
+                  True, True, True, True, True,
+                  True, True, False]
 
 
 def build_debug_csv(game):

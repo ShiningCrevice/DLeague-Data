@@ -4,7 +4,7 @@ import pandas as pd
 from tabulate import tabulate
 
 from utils import check_raw_data, int2bin, build_debug_csv
-from utils import entries_abbr as readme_entries
+from utils import entries_abbr as readme_entries, entries_switch
 
 TG = "data/games.csv"
 TR = "data/rounds.csv"
@@ -164,6 +164,7 @@ def process_data():
             ]
         statistics = pd.DataFrame(statistics, columns=players, index=readme_entries)
         statistics.to_csv(os.path.join(STATS_DIR, f"{s}.csv"))
+        statistics = statistics.loc[entries_switch]
         if sid < len(n_regular_games):
             readme += f"\n## Statistics of {s} (Final)\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
         else:
