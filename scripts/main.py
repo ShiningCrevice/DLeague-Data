@@ -1,4 +1,5 @@
 import os
+import os.path as osp
 import json
 import pandas as pd
 from tabulate import tabulate
@@ -14,6 +15,7 @@ README = "README.md"
 STATS_DIR = "statistics"
 
 players = ['LJL7', '0MRS', '5JMY', 'PARY']
+players_map = {'wk': 'LJL7', 'gy': '0MRS', 'tb': '5JMY', 'cc': 'PARY'}
 bonus = [20000, -20000, -40000, -60000]
 n_regular_games = [0, 49, 50]
 s1_base_pt_1000 = [298100, 81900, -94100, -288900]
@@ -48,96 +50,156 @@ def process_data():
         cnt_g = 0
         cnt_r = 0
 
-        games = sorted(os.listdir(os.path.join(RAW, s)), key=lambda x: int(x[1:-5]))
+        games = sorted(os.listdir(osp.join(RAW, s)), key=lambda x: int(x[1:-5]))
         for g in games:
-            gid = int(g[1:-5])
-            with open(os.path.join(RAW, s, g)) as f:
-                data = json.load(f)
-            if s != 'S1':
-                legal, msg = check_raw_data(data)
-                if not legal:
-                    print(f"Error in {s}/G{gid}: {msg}")
-                    build_debug_csv(f'{s}/G{gid}')
-                    continue
-                else:
-                    if os.path.exists(f"debug_{s}_G{gid}.csv"):
-                        os.remove(f"debug_{s}_G{gid}.csv")
-                        print(f"Removed debug_{s}_G{gid}.csv.")
-            p = [data[i]['PlayerId'] for i in range(4)]
-            final_score = [data[i]['Score'][-1] for i in range(4)]
-            sorted_score = sorted(final_score, reverse=True)
-            ranking = [sorted_score.index(s) + 1 for s in final_score]
-            points_1000 = [s + bonus[sorted_score.index(s)] for s in final_score]
-            raw_points_1000 = [s - 25000 for s in final_score]
-            points = [round(p / 1000, 1) for p in points_1000]
+            gid = int(osp.splitext(g)[0][1:])
+            if osp.splitext(g)[1] == '.json': 
+                with open(osp.join(RAW, s, g)) as f:
+                    data = json.load(f)
+                if s != 'S1':
+                    legal, msg = check_raw_data(data)
+                    if not legal:
+                        print(f"Error in {s}/G{gid}: {msg}")
+                        build_debug_csv(f'{s}/G{gid}')
+                        continue
+                    else:
+                        if osp.exists(f"debug_{s}_G{gid}.csv"):
+                            os.remove(f"debug_{s}_G{gid}.csv")
+                            print(f"Removed debug_{s}_G{gid}.csv.")
+                p = [data[i]['PlayerId'] for i in range(4)]
+                final_score = [data[i]['Score'][-1] for i in range(4)]
+                sorted_score = sorted(final_score, reverse=True)
+                ranking = [sorted_score.index(s) + 1 for s in final_score]
+                points_1000 = [s + bonus[sorted_score.index(s)] for s in final_score]
+                raw_points_1000 = [s - 25000 for s in final_score]
+                points = [round(p / 1000, 1) for p in points_1000]
 
-            SID.append(data[0]['SID'])
-            GID.append(data[0]['GID'])
-            Date.append(data[0]['Time'].split('_')[0])
-            E.append(p[0])
-            S.append(p[1])
-            W.append(p[2])
-            N.append(p[3])
-            Scr_E.append(final_score[0])
-            Scr_S.append(final_score[1])
-            Scr_W.append(final_score[2])
-            Scr_N.append(final_score[3])
-            Rk_E.append(ranking[0])
-            Rk_S.append(ranking[1])
-            Rk_W.append(ranking[2])
-            Rk_N.append(ranking[3])
-            Pts_E.append(points[0])
-            Pts_S.append(points[1])
-            Pts_W.append(points[2])
-            Pts_N.append(points[3])
-
-            for i in range(4):
-                if gid <= n_regular_games[sid if sid < len(n_regular_games) else 0]:
-                    total_pt_1000[p[i]] += points_1000[i] / 2
-                else:
-                    total_pt_1000[p[i]] += points_1000[i]
-                raw_pt_1000[p[i]] += raw_points_1000[i]
-                acc_rank[p[i]] += ranking[i]
-                if ranking[i] == 1:
-                    cnt_1[p[i]] += 1
-                elif ranking[i] == 2:
-                    cnt_2[p[i]] += 1
-                elif ranking[i] == 3:
-                    cnt_3[p[i]] += 1
-                elif ranking[i] == 4:
-                    cnt_4[p[i]] += 1
-                if final_score[i] > highest_scr[p[i]]:
-                    highest_scr[p[i]] = final_score[i]
-                if final_score[i] < lowest_scr[p[i]]:
-                    lowest_scr[p[i]] = final_score[i]
-            cnt_g += 1
-
-            score = [data[i]['Score'] for i in range(4)]
-            ops = [data[i]['Operations'] for i in range(4)]
-            for k in range(1, len(score[0])):
-                RID.append(k)
-                SID_r.append(data[0]['SID'])
-                GID_r.append(data[0]['GID'])
-                Ryukyo.append(int2bin(1 if all(['N' in ops[i][k] for i in range(4)]) else 0))
-                Richi.append(int2bin(sum([1 << i for i in range(4) if 'R' in ops[i][k]])))
-                Agari.append(int2bin(sum([1 << i for i in range(4) if 'A' in ops[i][k]])))
-                Hoju.append(int2bin(sum([1 << i for i in range(4) if 'F' in ops[i][k]])))
-                Var_E.append(score[0][k] - score[0][k-1])
-                Var_S.append(score[1][k] - score[1][k-1])
-                Var_W.append(score[2][k] - score[2][k-1])
-                Var_N.append(score[3][k] - score[3][k-1])
+                SID.append(data[0]['SID'])
+                GID.append(data[0]['GID'])
+                Date.append(data[0]['Time'].split('_')[0])
+                E.append(p[0])
+                S.append(p[1])
+                W.append(p[2])
+                N.append(p[3])
+                Scr_E.append(final_score[0])
+                Scr_S.append(final_score[1])
+                Scr_W.append(final_score[2])
+                Scr_N.append(final_score[3])
+                Rk_E.append(ranking[0])
+                Rk_S.append(ranking[1])
+                Rk_W.append(ranking[2])
+                Rk_N.append(ranking[3])
+                Pts_E.append(points[0])
+                Pts_S.append(points[1])
+                Pts_W.append(points[2])
+                Pts_N.append(points[3])
 
                 for i in range(4):
-                    cnt_richi[p[i]] += 1 if 'R' in ops[i][k] else 0
-                    cnt_agari[p[i]] += 1 if 'A' in ops[i][k] else 0
-                    cnt_hoju[p[i]] += 1 if 'F' in ops[i][k] else 0
-                    cnt_ra[p[i]] += 1 if 'R' in ops[i][k] and 'A' in ops[i][k] else 0
-                    cnt_rf[p[i]] += 1 if 'R' in ops[i][k] and 'F' in ops[i][k] else 0
-                    if 'A' in ops[i][k]:
-                        agari_scr[p[i]] += score[i][k] - score[i][k-1]
-                    if 'F' in ops[i][k]:
-                        hoju_scr[p[i]] += score[i][k-1] - score[i][k]
-                cnt_r += 1
+                    if gid <= n_regular_games[sid if sid < len(n_regular_games) else 0]:
+                        total_pt_1000[p[i]] += points_1000[i] / 2
+                    else:
+                        total_pt_1000[p[i]] += points_1000[i]
+                    raw_pt_1000[p[i]] += raw_points_1000[i]
+                    acc_rank[p[i]] += ranking[i]
+                    if ranking[i] == 1:
+                        cnt_1[p[i]] += 1
+                    elif ranking[i] == 2:
+                        cnt_2[p[i]] += 1
+                    elif ranking[i] == 3:
+                        cnt_3[p[i]] += 1
+                    elif ranking[i] == 4:
+                        cnt_4[p[i]] += 1
+                    if final_score[i] > highest_scr[p[i]]:
+                        highest_scr[p[i]] = final_score[i]
+                    if final_score[i] < lowest_scr[p[i]]:
+                        lowest_scr[p[i]] = final_score[i]
+                cnt_g += 1
+
+                score = [data[i]['Score'] for i in range(4)]
+                ops = [data[i]['Operations'] for i in range(4)]
+                for k in range(1, len(score[0])):
+                    RID.append(k)
+                    SID_r.append(data[0]['SID'])
+                    GID_r.append(data[0]['GID'])
+                    Ryukyo.append(int2bin(1 if all(['N' in ops[i][k] for i in range(4)]) else 0))
+                    Richi.append(int2bin(sum([1 << i for i in range(4) if 'R' in ops[i][k]])))
+                    Agari.append(int2bin(sum([1 << i for i in range(4) if 'A' in ops[i][k]])))
+                    Hoju.append(int2bin(sum([1 << i for i in range(4) if 'F' in ops[i][k]])))
+                    Var_E.append(score[0][k] - score[0][k-1])
+                    Var_S.append(score[1][k] - score[1][k-1])
+                    Var_W.append(score[2][k] - score[2][k-1])
+                    Var_N.append(score[3][k] - score[3][k-1])
+
+                    for i in range(4):
+                        cnt_richi[p[i]] += 1 if 'R' in ops[i][k] else 0
+                        cnt_agari[p[i]] += 1 if 'A' in ops[i][k] else 0
+                        cnt_hoju[p[i]] += 1 if 'F' in ops[i][k] else 0
+                        cnt_ra[p[i]] += 1 if 'R' in ops[i][k] and 'A' in ops[i][k] else 0
+                        cnt_rf[p[i]] += 1 if 'R' in ops[i][k] and 'F' in ops[i][k] else 0
+                        if 'A' in ops[i][k]:
+                            agari_scr[p[i]] += score[i][k] - score[i][k-1]
+                        if 'F' in ops[i][k]:
+                            hoju_scr[p[i]] += score[i][k-1] - score[i][k]
+                    cnt_r += 1
+                
+            elif osp.splitext(g)[1] == '.txt':
+                data = []
+                with open(osp.join(RAW, s, g)) as f:
+                    for line in f:
+                        data.append(line.strip().split())
+                p = [players_map[data[i][0]] for i in range(4)]
+                final_score = [int(data[i][1]) for i in range(4)]
+                sorted_score = sorted(final_score, reverse=True)
+                ranking = [sorted_score.index(s) + 1 for s in final_score]
+                points_1000 = [s + bonus[sorted_score.index(s)] for s in final_score]
+                raw_points_1000 = [s - 25000 for s in final_score]
+                points = [round(p / 1000, 1) for p in points_1000]
+
+                SID.append(sid)
+                GID.append(gid)
+                Date.append('Unknown')
+                E.append(p[0])
+                S.append(p[1])
+                W.append(p[2])
+                N.append(p[3])
+                Scr_E.append(final_score[0])
+                Scr_S.append(final_score[1])
+                Scr_W.append(final_score[2])
+                Scr_N.append(final_score[3])
+                Rk_E.append(ranking[0])
+                Rk_S.append(ranking[1])
+                Rk_W.append(ranking[2])
+                Rk_N.append(ranking[3])
+                Pts_E.append(points[0])
+                Pts_S.append(points[1])
+                Pts_W.append(points[2])
+                Pts_N.append(points[3])
+
+                for i in range(4):
+                    if gid <= n_regular_games[sid if sid < len(n_regular_games) else 0]:
+                        total_pt_1000[p[i]] += points_1000[i] / 2
+                    else:
+                        total_pt_1000[p[i]] += points_1000[i]
+                    raw_pt_1000[p[i]] += raw_points_1000[i]
+                    acc_rank[p[i]] += ranking[i]
+                    if ranking[i] == 1:
+                        cnt_1[p[i]] += 1
+                    elif ranking[i] == 2:
+                        cnt_2[p[i]] += 1
+                    elif ranking[i] == 3:
+                        cnt_3[p[i]] += 1
+                    elif ranking[i] == 4:
+                        cnt_4[p[i]] += 1
+                    if final_score[i] > highest_scr[p[i]]:
+                        highest_scr[p[i]] = final_score[i]
+                    if final_score[i] < lowest_scr[p[i]]:
+                        lowest_scr[p[i]] = final_score[i]
+                cnt_g += 1
+            
+            else:
+                print(f"Error: Unknown file type in {s}/{g}")
+                continue
+        
 
         statistics = {}
         for i in range(4):
@@ -163,7 +225,7 @@ def process_data():
                 lowest_scr[players[i]]
             ]
         statistics = pd.DataFrame(statistics, columns=players, index=readme_entries)
-        statistics.to_csv(os.path.join(STATS_DIR, f"{s}.csv"))
+        statistics.to_csv(osp.join(STATS_DIR, f"{s}.csv"))
         statistics = statistics.loc[entries_switch]
         if sid < len(n_regular_games):
             readme += f"\n## Statistics of {s} (Final)\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
