@@ -19,9 +19,9 @@ entries_abbr = ['Pt', 'RawPt', 'AP', 'RR', 'WR',
                 'DIR', 'RenR', 'A4R', 'RWR', 'RDIR', 
                 'APW', 'APD', '1st', '2nd', '3rd', 
                 '4th', 'HiScr', 'LoScr']
-entries_switch = [True, True, True, True, True, 
-                  True, True, True, True, True, 
-                  True, True, True, True, True,
+entries_switch = [True, True, True, False, False, 
+                  False, True, True, False, False, 
+                  False, False, True, True, True,
                   True, True, False]
 
 
