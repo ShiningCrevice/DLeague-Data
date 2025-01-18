@@ -1,15 +1,28 @@
 # DLeague-Data
 
-Data and its processing codes for our DLeague.
+Data and its processing codes for our DLeague.  
 
-Statstics are presented below. You can check [this file](./docs/abbr_reference.md) for abbreviations used in column-headers.
+## Usage
 
-## Statistics of S2 (Final)
+**Some** of the statstics are presented at the end. You may check [`docs/abbr_reference.md`](docs/abbr_reference.md) for abbreviations used in column-headers, or [`statistics`](statistics) for **all** calculated statistics.  
+
+For data updates, modify `raw_data` and run `scripts/main.py`.  
+To switch the rows shown in this README, modify `entries_switch` [here](scripts/utils.py#L22) and re-run `scripts/main.py`.  
+
+## Repo structure
+
+[`raw_data`](raw_data) stores raw json files produced by *DLeague Light* and then concatenated manually.  
+[`data`](data) stores two tables where each row records infos of a single game or round.  
+[`scripts`](scripts) stores the python scripts used for proccessing data from raw.  
+
+## Statistics
+
+### S2 (Final)
 
 |       |     LJL7 |     0MRS |     5JMY |     PARY |
 |-------|----------|----------|----------|----------|
-| Pt    |   111.9  |  -159.2  |    77.8  |   -30.4  |
-| RawPt |    66.8  |  -121    |   103.4  |   -49.2  |
+| Pt    |   111.9  |  -159.2  |    77.5  |   -30.1  |
+| RawPt |    66.8  |  -121    |   102.8  |   -48.6  |
 | AP    |     2.5  |     2.56 |     2.47 |     2.47 |
 | RenR  |    50    |    51.52 |    46.97 |    51.52 |
 | A4R   |    72.73 |    66.67 |    83.33 |    77.27 |
@@ -19,7 +32,7 @@ Statstics are presented below. You can check [this file](./docs/abbr_reference.m
 | 4th   |    18    |    22    |    11    |    15    |
 | HiScr | 66400    | 62600    | 70200    | 50800    |
 
-## Statistics of S1 (Final)
+### S1 (Final)
 
 |       |     LJL7 |     0MRS |     5JMY |     PARY |
 |-------|----------|----------|----------|----------|

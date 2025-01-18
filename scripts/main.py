@@ -50,7 +50,16 @@ def process_data():
         cnt_g = 0
         cnt_r = 0
 
-        games = sorted(os.listdir(osp.join(RAW, s)), key=lambda x: int(x[1:-5]))
+        games = os.listdir(osp.join(RAW, s))
+        unique_names = {}
+        for f in games:
+            b, e = osp.splitext(f)
+            if b not in unique_names or e == '.json':
+                unique_names[b] = f
+            else:
+                print(f"Waring: Duplicate file name {f} in {s}.")
+        games = list(unique_names.values())
+        games.sort(key=lambda x: int(osp.splitext(x)[0][1:]))
         for g in games:
             gid = int(osp.splitext(g)[0][1:])
             if osp.splitext(g)[1] == '.json': 
@@ -59,13 +68,13 @@ def process_data():
                 if s != 'S1':
                     legal, msg = check_raw_data(data)
                     if not legal:
-                        print(f"Error in {s}/G{gid}: {msg}")
-                        build_debug_csv(f'{s}/G{gid}')
+                        print(f"Error in {s}/G{gid:02d}: {msg}")
+                        build_debug_csv(f'{s}/G{gid:02d}')
                         continue
                     else:
-                        if osp.exists(f"debug_{s}_G{gid}.csv"):
-                            os.remove(f"debug_{s}_G{gid}.csv")
-                            print(f"Removed debug_{s}_G{gid}.csv.")
+                        if osp.exists(f"debug_{s}_G{gid:02d}.csv"):
+                            os.remove(f"debug_{s}_G{gid:02d}.csv")
+                            print(f"Removed debug_{s}_G{gid:02d}.csv.")
                 p = [data[i]['PlayerId'] for i in range(4)]
                 final_score = [data[i]['Score'][-1] for i in range(4)]
                 sorted_score = sorted(final_score, reverse=True)
@@ -228,9 +237,9 @@ def process_data():
         statistics.to_csv(osp.join(STATS_DIR, f"{s}.csv"))
         statistics = statistics.loc[entries_switch]
         if sid < len(n_regular_games):
-            readme += f"\n## Statistics of {s} (Final)\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
+            readme += f"\n### {s} (Final)\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
         else:
-            readme += f"\n## Statistics of {s} (Regular Season)\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
+            readme += f"\n### {s} (Regular Season)\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
 
     tg = pd.DataFrame({
         'SID': SID,

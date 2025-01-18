@@ -32,12 +32,11 @@ def build_debug_csv(game):
 
     cnt_r = max([len(data[i]['Score']) for i in range(4)])
 
-    df = pd.DataFrame(
-        {data[i]['PlayerId']: ["0(S)"] +
-         [f"{data[i]['Score'][j+1]-data[i]['Score'][j]} " +
-          f"({data[i]['Operations'][j+1]})" if j+1 < len(data[i]['Score']) and j+1 < len(data[i]['Operations']) else ""
-          for j in range(cnt_r - 1)]
-         for i in range(4)})
+    df = pd.DataFrame({
+        **{data[i]['PlayerId']: ["0(S)"] + 
+           [f"{data[i]['Score'][j+1]-data[i]['Score'][j]} " + f"({data[i]['Operations'][j+1]})" if j+1 < len(data[i]['Score']) and j+1 < len(data[i]['Operations']) else "" for j in range(cnt_r - 1)] for i in range(4)}, 
+        **{"Sum": [sum([data[i]['Score'][j] for i in range(4)]) for j in range(cnt_r)]},
+    })
 
     df.to_csv(f"debug_{game.replace('/', '_')}.csv")
     print(f"Built debug csv for {game}.")
@@ -98,6 +97,10 @@ def check_raw_data(data: list[dict]) -> tuple[bool, str]:
     n_scores = set([len(s) for s in scores])
     if len(n_scores) != 1:
         return False, f"Inconsistent numbers of rounds in scores: {n_scores}."
+    sums = [sum([s[i] for s in scores]) for i in range(n_scores.copy().pop())]
+    for i in range(len(sums)):
+        if sums[i] % 1000 != 0:
+            return False, f"Sum of scores in round {i} should be a multiple of 1000, but got {sums[i]}."
     final_sum = sum([s[-1] for s in scores])
     if final_sum != 100000:
         return False, f"Sum of scores should be 100000, but got {final_sum}."

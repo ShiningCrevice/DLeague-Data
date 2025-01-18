@@ -18,4 +18,5 @@
 | 2nd            | Second Place Count              | 二位次数     |
 | 3rd            | Third Place Count               | 三位次数     |
 | 4th            | Fourth Place Count              | 四位次数     |
-| HHS            | Highest Hanchan Score           | 半庄最高得点 |
+| HiScr          | Highest Hanchan Score           | 半庄最高得点 |
+| LoScr          | Lowest Hanchan Score            | 半庄最低得点 |
