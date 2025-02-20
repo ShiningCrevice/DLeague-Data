@@ -16,9 +16,10 @@ STATS_DIR = "statistics"
 
 players = ['LJL7', '0MRS', '5JMY', 'PARY']
 players_map = {'wk': 'LJL7', 'gy': '0MRS', 'tb': '5JMY', 'cc': 'PARY'}
-bonus = [20000, -20000, -40000, -60000]
-n_regular_games = [0, 49, 50]
-s1_base_pt_1000 = [298100, 81900, -94100, -288900]
+bonus_ml = [20000, -20000, -40000, -60000]  # MLeague马点
+bonus_skis = [5000, -15000, -35000, -55000] # 最高位战马点
+s1_base_pt_1000 = [298100, 81900, -94100, -288900]  # S1前期APP未开发时的初始分
+n_regular_games = [0, 49, 50]   # 第0项为占位，此后每项为每个赛季常规赛的场次，常规赛未结束时不用记
 
 
 def process_data():
@@ -46,7 +47,7 @@ def process_data():
         agari_scr = {p: 0 for p in players}
         hoju_scr = {p: 0 for p in players}
         highest_scr = {p: 0 for p in players}
-        lowest_scr = {p: 0 for p in players}
+        lowest_scr = {p: 1000000 for p in players}
         cnt_g = 0
         cnt_r = 0
 
@@ -79,7 +80,10 @@ def process_data():
                 final_score = [data[i]['Score'][-1] for i in range(4)]
                 sorted_score = sorted(final_score, reverse=True)
                 ranking = [sorted_score.index(s) + 1 for s in final_score]
-                points_1000 = [s + bonus[sorted_score.index(s)] for s in final_score]
+                if sid in [1, 2]:   # 使用MLeague马点的赛季
+                    points_1000 = [s + bonus_ml[sorted_score.index(s)] for s in final_score]
+                elif sid in [3,]:  # 使用最高位战马点的赛季
+                    points_1000 = [s + bonus_skis[sorted_score.index(s)] for s in final_score]
                 raw_points_1000 = [s - 25000 for s in final_score]
                 points = [round(p / 1000, 1) for p in points_1000]
 
@@ -160,7 +164,7 @@ def process_data():
                 final_score = [int(data[i][1]) for i in range(4)]
                 sorted_score = sorted(final_score, reverse=True)
                 ranking = [sorted_score.index(s) + 1 for s in final_score]
-                points_1000 = [s + bonus[sorted_score.index(s)] for s in final_score]
+                points_1000 = [s + bonus_ml[sorted_score.index(s)] for s in final_score]
                 raw_points_1000 = [s - 25000 for s in final_score]
                 points = [round(p / 1000, 1) for p in points_1000]
 
@@ -236,10 +240,11 @@ def process_data():
         statistics = pd.DataFrame(statistics, columns=players, index=readme_entries)
         statistics.to_csv(osp.join(STATS_DIR, f"{s}.csv"))
         statistics = statistics.loc[entries_switch]
-        if sid < len(n_regular_games):
-            readme += f"\n### {s} (Final)\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
-        else:
-            readme += f"\n### {s} (Regular Season)\n\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
+        if sid == len(seasons): # 只展示最新赛季的统计数据
+            if sid < len(n_regular_games):  # 进入决赛
+                readme += f"\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
+            else:   # 常规赛未结束
+                readme += f"\n{tabulate(statistics, headers='keys', tablefmt='github')}\n"
 
     tg = pd.DataFrame({
         'SID': SID,

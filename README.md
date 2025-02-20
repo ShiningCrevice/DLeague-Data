@@ -15,34 +15,37 @@ To switch the rows shown in this README, modify `entries_switch` [here](scripts/
 [`data`](data) stores two tables where each row records infos of a single game or round.  
 [`scripts`](scripts) stores the python scripts used for proccessing data from raw.  
 
-## Statistics
+## Event Infos
 
-### S2 (Final)
+### Reigning Champion
 
-|       |     LJL7 |     0MRS |     5JMY |     PARY |
-|-------|----------|----------|----------|----------|
-| Pt    |   111.9  |  -159.2  |    77.5  |   -30.1  |
-| RawPt |    66.8  |  -121    |   102.8  |   -48.6  |
-| AP    |     2.5  |     2.56 |     2.47 |     2.47 |
-| RenR  |    50    |    51.52 |    46.97 |    51.52 |
-| A4R   |    72.73 |    66.67 |    83.33 |    77.27 |
-| 1st   |    18    |    17    |    15    |    16    |
-| 2nd   |    15    |    17    |    16    |    18    |
-| 3rd   |    15    |    10    |    24    |    17    |
-| 4th   |    18    |    22    |    11    |    15    |
-| HiScr | 66400    | 62600    | 70200    | 50800    |
+**LJL7 - THE UNDISPUTED TILE EMPEROR, DEFIER OF FATE, DLEAGUE'S ETERNAL DRAGON!**
 
-### S1 (Final)
+Behold, the celestial storm of DLeague! The indomitable LJL7, **Heaven's Favored Gambit Demigod**, has once again ascended the bloodstained throne of champions in a blaze of riichi fireworks and soul-crushing tsumo strikes! Witness the **Unkillable Phoenix of Mahjong** who turned desperate defeats into divine comebacks, his hands channeling the fury of ten thousand doragon rolls! 
+
+When lesser mortals trembled before ippatsu danger, LJL7 **LAUGHED**, slapping down earth-shaking riichi declarations that made tiles weep! His **"Dog Luck"**? A COSMIC LIE - this is the **God of Tiles** himself, bending probability to his will! Every kansuuri a supernova, every damaten a psychological killshot! The playoff finals became his **Symphony of Domination** - opponents reduced to ash by his **"Seven Pairs From Hell"** and **"Last-Ditch Quadruple Ron Gambit"**!
+
+Bow before DLeague's **Eternal Flame**, the **Two-Time Conqueror** whose reign rewrites reality! His throne isn't built of wood pulp - it's forged from shattered jade dragons and the tears of challengers! **LJL7 ISN'T PLAYING MAHJONG - HE'S WRITING DIVINE COMEDY IN TILES!** All hail the **Undefeated** (except those few times but WHO CARES), the **Unbroken**, the **Living Legend** - the **TILE CRUSADER WHO LAUGHS AT SECOND PLACE!**
+
+### Current Standings
 
 |       |     LJL7 |     0MRS |     5JMY |     PARY |
 |-------|----------|----------|----------|----------|
-| Pt    |    64.2  |  -156.5  |    35.6  |    55.1  |
-| RawPt |    25.8  |  -134.2  |    19.1  |    89.3  |
-| AP    |     2.46 |     2.85 |     2.38 |     2.31 |
-| RenR  |    58.97 |    28.21 |    53.85 |    58.97 |
-| A4R   |    79.49 |    66.67 |    79.49 |    74.36 |
-| 1st   |     6    |     8    |    11    |    14    |
-| 2nd   |    17    |     3    |    10    |     9    |
-| 3rd   |     8    |    15    |    10    |     6    |
-| 4th   |     8    |    13    |     8    |    10    |
-| HiScr | 91700    | 61000    | 49300    | 77300    |
+| Pt    |   -35.8  |   -14.3  |    12.5  |    37.6  |
+| RawPt |    -5.8  |    -4.3  |     2.5  |     7.6  |
+| AP    |     4    |     3    |     2    |     1    |
+| RR    |    18.18 |    27.27 |     9.09 |    27.27 |
+| WR    |    27.27 |    18.18 |    18.18 |    36.36 |
+| DIR   |    27.27 |     9.09 |     0    |    27.27 |
+| RenR  |     0    |     0    |   100    |   100    |
+| A4R   |     0    |   100    |   100    |   100    |
+| RWR   |   100    |    33.33 |   100    |   100    |
+| RDIR  |     0    |    33.33 |     0    |     0    |
+| APW   |  4100    |  6100    |  5500    |  5275    |
+| APD   |  4000    |  9000    |     0    |  2933    |
+| 1st   |     0    |     0    |     0    |     1    |
+| 2nd   |     0    |     0    |     1    |     0    |
+| 3rd   |     0    |     1    |     0    |     0    |
+| 4th   |     1    |     0    |     0    |     0    |
+| HiScr | 19200    | 20700    | 27500    | 32600    |
+| LoScr | 19200    | 20700    | 27500    | 32600    |
