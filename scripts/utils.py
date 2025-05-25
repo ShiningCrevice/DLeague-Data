@@ -35,7 +35,7 @@ def build_debug_csv(game):
     df = pd.DataFrame({
         **{data[i]['PlayerId']: ["0(S)"] + 
            [f"{data[i]['Score'][j+1]-data[i]['Score'][j]} " + f"({data[i]['Operations'][j+1]})" if j+1 < len(data[i]['Score']) and j+1 < len(data[i]['Operations']) else "" for j in range(cnt_r - 1)] for i in range(4)}, 
-        **{"Sum": [sum([data[i]['Score'][j] for i in range(4)]) for j in range(cnt_r)]},
+        **{"Sum": [sum([(data[i]['Score'][j] if j < len(data[i]['Score']) else 0) for i in range(4)]) for j in range(cnt_r)]},
     })
 
     df.to_csv(f"debug_{game.replace('/', '_')}.csv")
