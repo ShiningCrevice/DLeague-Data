@@ -2,7 +2,7 @@ import json
 import mysql.connector
 import argparse
 
-from utils import build_csv, fix_GT61
+from utils import build_csv, fix_player_id
 
 
 HOST = 'localhost'
@@ -104,7 +104,7 @@ if __name__ == '__main__':
     TABLE_G = argpar.parse_args().Table_G or TABLE_G
     TABLE_R = argpar.parse_args().Table_R or TABLE_R
 
-    fix_GT61(file_path)
+    fix_player_id(file_path)
 
     with open(file_path, mode='r') as fp:
         records = json.load(fp)

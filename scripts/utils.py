@@ -42,34 +42,24 @@ def build_debug_csv(game):
     print(f"Built debug csv for {game}.")
 
 
-def fix_GT61(file_path):
+def fix_player_id(file_path):
     try:
-        with open(file_path, 'r', encoding='utf-8') as file:
+        with open(file_path, 'r') as file:
             data = json.load(file)
 
-        def update_values(obj):
-            flag = False
-            if isinstance(obj, dict):
-                for key, value in obj.items():
-                    if value == "GT61":
-                        obj[key] = "0MRS"
-                        flag = True
-                    else:
-                        update_values(value)
-            elif isinstance(obj, list):
-                for index in range(len(obj)):
-                    if obj[index] == "GT61":
-                        obj[index] = "0MRS"
-                        flag = True
-                    else:
-                        update_values(obj[index])
-            return flag
+        flag = False
+        for index in range(len(data)):
+            if data[index]['PlayerId'] == 'GT61':
+                data[index]['PlayerId'] = '0MRS'
+                flag = True
+            elif data[index]['PlayerId'] == 'R9W8':
+                data[index]['PlayerId'] = 'PARY'
+                flag = True
 
-        if update_values(data):
-            with open(file_path, 'w', encoding='utf-8') as file:
+        if flag:
+            with open(file_path, 'w') as file:
                 json.dump(data, file, ensure_ascii=False, indent=4)
-
-            print(f"Fixed GT61 to 0MRS in {file_path}")
+            print(f"Fixed GT61 to 0MRS and R9W8 to PARY in {file_path}")
 
     except Exception as e:
         print(f"Error occurred while fixing {file_path}:\n{e}")
