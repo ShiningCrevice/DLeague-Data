@@ -19,4 +19,4 @@ To switch the rows shown in this README, modify `entries_switch` [here](scripts/
 
 The S3 season concluded on October 25, 2025, with player 0MRS emerging as the champion.
 
-### Final Standings of S3
+### Current Standings of S4

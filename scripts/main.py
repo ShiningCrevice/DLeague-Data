@@ -84,7 +84,7 @@ def process_data():
                 ranking = [sorted_score.index(s) + 1 for s in final_score]
                 if sid in [1, 2]:   # 使用MLeague马点的赛季
                     points_1000 = [s + bonus_ml[sorted_score.index(s)] for s in final_score]
-                elif sid in [3,]:  # 使用最高位战马点的赛季
+                elif sid in [3, 4]:  # 使用最高位战马点的赛季
                     points_1000 = [s + bonus_skis[sorted_score.index(s)] for s in final_score]
                 raw_points_1000 = [s - 25000 for s in final_score]
                 points = [round(p / 1000, 1) for p in points_1000]
