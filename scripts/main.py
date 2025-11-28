@@ -83,9 +83,27 @@ def process_data():
                 sorted_score = sorted(final_score, reverse=True)
                 ranking = [sorted_score.index(s) + 1 for s in final_score]
                 if sid in [1, 2]:   # 使用MLeague马点的赛季
-                    points_1000 = [s + bonus_ml[sorted_score.index(s)] for s in final_score]
+                    bonus = bonus_ml
                 elif sid in [3, 4]:  # 使用最高位战马点的赛季
-                    points_1000 = [s + bonus_skis[sorted_score.index(s)] for s in final_score]
+                    bonus = bonus_skis
+                else:
+                    raise ValueError(f"Unknown season ID {sid} for bonus points.")
+                # 处理同分情况
+                if sorted_score[0] == sorted_score[3]:
+                    bonus = [-25000] * 4
+                elif sorted_score[0] == sorted_score[2]:
+                    bonus = [(bonus[0] + bonus[1] + bonus[2]) // 3] * 3 + [bonus[3]]
+                elif sorted_score[1] == sorted_score[3]:
+                    bonus = [bonus[0]] + [(bonus[1] + bonus[2] + bonus[3]) // 3] * 3
+                elif sorted_score[0] == sorted_score[1] and sorted_score[2] == sorted_score[3]:
+                    bonus = [(bonus[0] + bonus[1]) // 2] * 2 + [(bonus[2] + bonus[3]) // 2] * 2
+                elif sorted_score[0] == sorted_score[1]:
+                    bonus = [(bonus[0] + bonus[1]) // 2] * 2 + bonus[2:]
+                elif sorted_score[1] == sorted_score[2]:
+                    bonus = [bonus[0]] + [(bonus[1] + bonus[2]) // 2] * 2 + [bonus[3]]
+                elif sorted_score[2] == sorted_score[3]:
+                    bonus = bonus[:2] + [(bonus[2] + bonus[3]) // 2] * 2
+                points_1000 = [s + bonus[sorted_score.index(s)] for s in final_score]
                 raw_points_1000 = [s - 25000 for s in final_score]
                 points = [round(p / 1000, 1) for p in points_1000]
 
