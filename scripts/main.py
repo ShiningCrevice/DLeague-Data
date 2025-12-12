@@ -4,7 +4,7 @@ import json
 import pandas as pd
 from tabulate import tabulate
 
-from utils import check_raw_data, int2bin, build_debug_csv, fix_player_id
+from utils import check_raw_data, int2bin, build_debug_csv, fix_data
 from utils import entries_abbr as readme_entries, entries_switch
 
 TG = "data/games.csv"
@@ -65,7 +65,7 @@ def process_data():
             gid = int(osp.splitext(g)[0][1:])
             if osp.splitext(g)[1] == '.json': 
                 file_path = osp.join(RAW, s, g)
-                fix_player_id(file_path)  # 修正PlayerId
+                fix_data(file_path)  # 修正PlayerId
                 with open(file_path) as f:
                     data = json.load(f)
                 if s != 'S1':

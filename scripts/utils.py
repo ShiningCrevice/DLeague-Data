@@ -42,24 +42,32 @@ def build_debug_csv(game):
     print(f"Built debug csv for {game}.")
 
 
-def fix_player_id(file_path):
+def fix_data(file_path):
     try:
+        sid = int(file_path.split('/')[-2][1:])
         with open(file_path, 'r') as file:
             data = json.load(file)
 
-        flag = False
+        flag1, flag2 = False, False
         for index in range(len(data)):
             if data[index]['PlayerId'] == 'GT61':
                 data[index]['PlayerId'] = '0MRS'
-                flag = True
+                flag1 = True
             elif data[index]['PlayerId'] == 'R9W8':
                 data[index]['PlayerId'] = 'PARY'
-                flag = True
+                flag1 = True
+            if data[index]['SID'] != sid:
+                data[index]['SID'] = sid
+                flag2 = True
 
-        if flag:
+        if flag1:
             with open(file_path, 'w') as file:
                 json.dump(data, file, ensure_ascii=False, indent=4)
             print(f"Fixed GT61 to 0MRS and R9W8 to PARY in {file_path}")
+        if flag2:
+            with open(file_path, 'w') as file:
+                json.dump(data, file, ensure_ascii=False, indent=4)
+            print(f"Fixed SID to {sid} in {file_path}")
 
     except Exception as e:
         print(f"Error occurred while fixing {file_path}:\n{e}")
