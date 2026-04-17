@@ -21,6 +21,8 @@ The S3 season concluded on October 25, 2025, with player 0MRS emerging as the ch
 
 ### Current Standings of S4
 
+**Data updated to S4 Hanchan #37**
+
 |       |      LJL7 |      0MRS |     5JMY |      PARY |
 |-------|-----------|-----------|----------|-----------|
 | Pt    |   -428.3  |     77.8  |   386.9  |    -36.4  |
