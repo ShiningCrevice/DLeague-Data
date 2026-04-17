@@ -321,7 +321,7 @@ def update_readme_with_season(readme, statistics_df, sid, cnt_g, is_latest_seaso
     
     if is_latest_season:
         # Add current season hanchan count information
-        readme += f"\n**Data updated to S{sid} Hanchan #{cnt_g}**\n\n"
+        readme += f"\n**Data updated to S{sid} G{cnt_g}**\n\n"
         readme += f"{tabulate(statistics_df, headers='keys', tablefmt='github')}\n"
     # Only latest season gets added to README (original behavior)
     

@@ -8,7 +8,7 @@ Data and its processing codes for our DLeague.
 
 For data updates, modify `raw_data` and run `scripts/main.py`.  
 To switch the rows shown in this README, modify `entries_switch` [here](scripts/utils.py#L22) and re-run `scripts/main.py`.  
-To infer a hanchan's log-style flow from one game record, use `scripts/flow.py` with a game id such as `S4/G37`. The script reads one `raw_data/S*/G*.json` file, infers each round's result using the stored scores and operation flags, and prints all plausible flows when a draw pattern is ambiguous.  
+To infer a hanchan's log-style flow from one game record, use `scripts/flow.py` with a game id such as `python scripts/flow.py -g S4/G37`. The script reads one `raw_data/S*/G*.json` file, infers each round's result using the stored scores and operation flags, and prints all plausible flows when a draw pattern is ambiguous.  
 
 ## Repo structure
 
@@ -22,25 +22,25 @@ The S3 season concluded on October 25, 2025, with player 0MRS emerging as the ch
 
 ### Current Standings of S4
 
-**Data updated to S4 Hanchan #37**
+**Data updated to S4 G40**
 
 |       |      LJL7 |      0MRS |     5JMY |      PARY |
 |-------|-----------|-----------|----------|-----------|
-| Pt    |   -428.3  |     77.8  |   386.9  |    -36.4  |
-| RawPt |   -158.3  |    -22.2  |   226.9  |    -46.4  |
-| AP    |      2.86 |      2.35 |     2.27 |      2.49 |
-| RR    |     20.17 |     21.91 |    17.79 |     21.26 |
-| WR    |     19.52 |     22.13 |    21.48 |     21.91 |
-| DIR   |     15.4  |     15.18 |    10.63 |     15.18 |
-| RenR  |     35.14 |     62.16 |    59.46 |     45.95 |
-| A4R   |     62.16 |     75.68 |    89.19 |     72.97 |
-| RWR   |     39.78 |     48.51 |    48.78 |     51.02 |
-| RDIR  |     13.98 |     12.87 |     9.76 |      6.12 |
-| APW   |   7092    |   6733    |  7658    |   6474    |
-| APD   |   6968    |   6227    |  4794    |   5944    |
-| 1st   |      6    |     10    |     9    |     12    |
-| 2nd   |      7    |     13    |    13    |      5    |
-| 3rd   |     10    |      5    |    11    |     10    |
-| 4th   |     14    |      9    |     4    |     10    |
+| Pt    |   -420.8  |    107.4  |   280.8  |     32.6  |
+| RawPt |   -160.8  |    -22.6  |   190.8  |     -7.4  |
+| AP    |      2.83 |      2.33 |     2.38 |      2.45 |
+| RR    |     19.8  |     22.02 |    18.18 |     20.61 |
+| WR    |     19.6  |     22.42 |    20.81 |     22.22 |
+| DIR   |     14.95 |     15.15 |    10.71 |     14.95 |
+| RenR  |     37.5  |     62.5  |    55    |     47.5  |
+| A4R   |     65    |     77.5  |    85    |     72.5  |
+| RWR   |     40.82 |     49.54 |    47.78 |     50.98 |
+| RDIR  |     14.29 |     11.93 |     8.89 |      6.86 |
+| APW   |   7018    |   6717    |  7652    |   6624    |
+| APD   |   6838    |   6207    |  5072    |   5742    |
+| 1st   |      6    |     11    |     9    |     14    |
+| 2nd   |      9    |     14    |    13    |      5    |
+| 3rd   |     11    |      6    |    12    |     10    |
+| 4th   |     14    |      9    |     6    |     11    |
 | HiScr |  75200    |  77100    | 77200    |  73200    |
 | LoScr | -52100    | -36500    | -3200    | -24200    |
