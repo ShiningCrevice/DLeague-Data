@@ -8,6 +8,7 @@ Data and its processing codes for our DLeague.
 
 For data updates, modify `raw_data` and run `scripts/main.py`.  
 To switch the rows shown in this README, modify `entries_switch` [here](scripts/utils.py#L22) and re-run `scripts/main.py`.  
+To infer a hanchan's log-style flow from one game record, use `scripts/flow.py` with a game id such as `S4/G37`. The script reads one `raw_data/S*/G*.json` file, infers each round's result using the stored scores and operation flags, and prints all plausible flows when a draw pattern is ambiguous.  
 
 ## Repo structure
 
