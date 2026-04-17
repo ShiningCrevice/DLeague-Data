@@ -132,3 +132,5 @@ cython_debug/
 .flake8
 
 debug_*.csv
+.codex
+AGENTS.md
