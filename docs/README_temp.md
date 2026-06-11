@@ -10,6 +10,8 @@ For data updates, modify `raw_data` and run `scripts/main.py`.
 To switch the rows shown in this README, modify `entries_switch` [here](scripts/utils.py#L22) and re-run `scripts/main.py`.  
 To infer a hanchan's log-style flow from one game record, use `scripts/flow.py` with a game id such as `python scripts/flow.py -g S4/G37`. The script reads one `raw_data/S*/G*.json` file, infers each round's result using the stored scores and operation flags, and prints all plausible flows when a draw pattern is ambiguous.  
 
+Standings note: `Pt` is the weighted total score used by the season format. It is calculated from each game's final score plus the season's placement-point offset, with regular-season games weighted according to `n_regular_games` in `scripts/main.py`. `RawPt` is the unweighted raw point total, calculated as each game's final score minus 25000 and summed across all games. Because these two rows use different weighting rules, `Pt - RawPt` is not simply the placement-point total.  
+
 ## Repo structure
 
 [`raw_data`](raw_data) stores raw json files produced by *DLeague Light* and then concatenated manually.  
